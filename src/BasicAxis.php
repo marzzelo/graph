@@ -5,7 +5,7 @@ namespace Marzzelo\Graph;
 
 use Intervention\Image\Image;
 
-class basicAxis implements IAxis
+class BasicAxis implements IAxis
 {
 	public float $xmin;
 
@@ -96,7 +96,7 @@ class basicAxis implements IAxis
 		return $canvas;
 	}
 
-	private function XY(float $x, float $y): array
+	public function XY(float $x, float $y): array
 	{
 		$X = intval($this->w * ($x - $this->xmin) / ($this->xmax - $this->xmin));
 		$Y = intval($this->h * ($this->ymax - $y) / ($this->ymax - $this->ymin));
