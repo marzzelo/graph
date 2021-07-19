@@ -1,0 +1,31 @@
+{
+  "name": "marzzelo/graph",
+  "version": "0.0.1",
+  "description": "Little cartesian graphics generator",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Marcelo Valdez",
+      "email": "zedlavolecram@gmail.com"
+    }
+  ],
+  "minimum-stability": "stable",
+  "require": {
+    "php": ">=7.4",
+    "intervention/image": "^2.5"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^9.5"
+  },
+  "autoload": {
+    "psr-4": {
+      "Marzzelo\\Graph\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Marzzelo\\Tests\\": "tests/"
+    }
+  }
+}
