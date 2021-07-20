@@ -8,7 +8,10 @@ class Graph
 {
 	private IAxis $axis;
 
-	private IDataSet $dataSet;
+	/**
+	 * @var \Marzzelo\Graph\IDataSet[]
+	 */
+	private array $series;
 
 	private Image $canvas;
 
@@ -24,22 +27,24 @@ class Graph
 
 	public function addDataSet(IDataSet $dataSet)
 	{
-		$this->dataSet = $dataSet;
+		$this->series[] = $dataSet;
 	}
 
 	public function render(): Image
 	{
 		$this->axis->draw($this->canvas, $this->frame->width_px, $this->frame->height_px);
 
-		$this->dataSet->draw($this->canvas, $this->axis, $this->frame->width_px, $this->frame->height_px);
+		foreach ($this->series as $dataSet) {
+			$dataSet->draw($this->canvas, $this->axis, $this->frame->width_px, $this->frame->height_px);
+		}
 
 		return $this->canvas;
 	}
 
-	public function render64(): string
+	public function render64(string $format = 'png'): string
 	{
-		$img64 = base64_encode($this->render()->encode('png'));
+		$img64 = base64_encode($this->render()->encode($format));
 
-		return "data:image/jpeg;base64,$img64";
+		return "data:image/$format;base64,$img64";
 	}
 }

@@ -45,7 +45,7 @@ class DataSet implements IDataSet
 		}
 	}
 
-	private function XY(float $x, float $y, int $width, int $height, IAxis $axis): array
+	protected function XY(float $x, float $y, int $width, int $height, IAxis $axis): array
 	{
 		$X = (float)$width * ($x - $axis->xmin) / ($axis->xmax - $axis->xmin);
 		$Y = (float)$height * ($axis->ymax - $y) / ($axis->ymax - $axis->ymin);
