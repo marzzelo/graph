@@ -7,13 +7,13 @@ use Intervention\Image\Image;
 
 class BasicAxis implements IAxis
 {
-	public float $xmin;
+	private float $_xmin;
 
-	public float $xmax;
+	private float $_xmax;
 
-	public float $ymin;
+	private float $_ymin;
 
-	public float $ymax;
+	private float $_ymax;
 
 	protected string $title = '', $xlabel = '', $ylabel = '';
 
@@ -25,20 +25,16 @@ class BasicAxis implements IAxis
 	 * basicAxis constructor.
 	 * @param float $margin Margin percentage
 	 */
-	public function __construct(XYPoint $ul, XYPoint $lr, float $margin = 20, string $title = '')
+	// public function __construct(XYPoint $ul, XYPoint $lr, float $margin = 20, string $title = '')
+	public function __construct(int $xm, int $xM, int $ym, int $yM, float $margin = 20, string $title = '')
 	{
-		$xm = $ul->x;
-		$xM = $lr->x;
-		$ym = $lr->y;
-		$yM = $ul->y;
-
 		$dx = $xM - $xm;
 		$dy = $yM - $ym;
 
-		$this->xmin = $xm - $margin / 100 * $dx;
-		$this->xmax = $xM + $margin / 100 * $dx;
-		$this->ymin = $ym - $margin / 100 * $dy;
-		$this->ymax = $yM + $margin / 100 * $dy;
+		$this->_xmin = $xm - $margin / 100 * $dx;
+		$this->_xmax = $xM + $margin / 100 * $dx;
+		$this->_ymin = $ym - $margin / 100 * $dy;
+		$this->_ymax = $yM + $margin / 100 * $dy;
 
 		$this->title = $title;
 	}
@@ -62,9 +58,9 @@ class BasicAxis implements IAxis
 
 		[$CX, $CY] = $this->XY(0, 0);
 
-		$sx = $this->stepx ?: ($this->xmax - $this->xmin) / 5;
-		$nmin = floor($this->xmin / $sx);
-		$nsteps = ($this->xmax - $this->xmin) / $sx;
+		$sx = $this->stepx ?: ($this->_xmax - $this->_xmin) / 5;
+		$nmin = floor($this->_xmin / $sx);
+		$nsteps = ($this->_xmax - $this->_xmin) / $sx;
 
 		// X-GRID
 		for ($i = $nmin; $i < $nsteps; $i++) {
@@ -75,9 +71,9 @@ class BasicAxis implements IAxis
 			$canvas->text($i * $sx, $xn, $yn - 3);
 		}
 
-		$sy = $this->stepy ?: ($this->ymax - $this->ymin) / 5;
-		$nmin = floor($this->ymin / $sy);
-		$nsteps = ($this->ymax - $this->ymin) / $sy;
+		$sy = $this->stepy ?: ($this->_ymax - $this->_ymin) / 5;
+		$nmin = floor($this->_ymin / $sy);
+		$nsteps = ($this->_ymax - $this->_ymin) / $sy;
 
 		// Y-GRID
 		for ($i = $nmin; $i < $nsteps; $i++) {
@@ -135,10 +131,41 @@ class BasicAxis implements IAxis
 
 	public function XY(float $x, float $y): array
 	{
-		$X = intval($this->w * ($x - $this->xmin) / ($this->xmax - $this->xmin));
-		$Y = intval($this->h * ($this->ymax - $y) / ($this->ymax - $this->ymin));
+		$X = intval($this->w * ($x - $this->_xmin) / ($this->_xmax - $this->_xmin));
+		$Y = intval($this->h * ($this->_ymax - $y) / ($this->_ymax - $this->_ymin));
 
 		return [$X, $Y];
 	}
 
+	/**
+	 * @return float|int
+	 */
+	public function xmin()
+	{
+		return $this->_xmin;
+	}
+
+	/**
+	 * @return float|int
+	 */
+	public function xmax()
+	{
+		return $this->_xmax;
+	}
+
+	/**
+	 * @return float|int
+	 */
+	public function ymin()
+	{
+		return $this->_ymin;
+	}
+
+	/**
+	 * @return float|int
+	 */
+	public function ymax()
+	{
+		return $this->_ymax;
+	}
 }

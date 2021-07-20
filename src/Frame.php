@@ -7,9 +7,9 @@ use Intervention\Image\Facades\Image as FImage;
 
 class Frame implements IFrame
 {
-	public int $width_px;
+	private int $width_px;
 
-	public int $height_px;
+	private int $height_px;
 
 	private string $background_color;
 
@@ -38,4 +38,13 @@ class Frame implements IFrame
 		return $canvas;
 	}
 
+	public function getHeight(): int
+	{
+		return $this->height_px;
+	}
+
+	public function getWidth(): int
+	{
+		return $this->width_px;
+	}
 }

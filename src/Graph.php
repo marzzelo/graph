@@ -30,12 +30,20 @@ class Graph
 		$this->series[] = $dataSet;
 	}
 
+	/**
+	 * @param \Marzzelo\Graph\IDataSet[] $dataSets
+	 */
+	public function addDataSets(array $dataSets)
+	{
+		$this->series = $dataSets;
+	}
+
 	public function render(): Image
 	{
-		$this->axis->draw($this->canvas, $this->frame->width_px, $this->frame->height_px);
+		$this->axis->draw($this->canvas, $this->frame->getWidth(), $this->frame->getHeight());
 
 		foreach ($this->series as $dataSet) {
-			$dataSet->draw($this->canvas, $this->axis, $this->frame->width_px, $this->frame->height_px);
+			$dataSet->draw($this->canvas, $this->axis, $this->frame->getWidth(), $this->frame->getHeight());
 		}
 
 		return $this->canvas;

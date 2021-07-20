@@ -16,9 +16,7 @@ class AutoAxis extends BasicAxis implements IAxis
 	{
 		[$xm, $xM, $ym, $yM] = $this->endpoints($series);
 
-		// $axis = new BasicAxis(new XYPoint($xm, $yM), new XYPoint($xM, $ym), 20, 'ERROR RELATIVO PARA MOD-' . $module->label);
-
-		parent::__construct(new XYPoint($xm, $yM), new XYPoint($xM, $ym), $margin, $title);
+		parent::__construct($xm, $xM, $ym, $yM, $margin, $title);
 	}
 
 	protected function endpoints(array $series): array
