@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 
 namespace Marzzelo\Graph;
@@ -21,12 +21,43 @@ class DataSet implements IDataSet
 		$this->color = $color;
 	}
 
-	public function draw(Image $canvas, IAxis $axis, int $width, int $height)
+	public function xBounds(): array
 	{
-		[$X0, $Y0] = $this->XY($this->data[0][0], $this->data[0][1], $width, $height, $axis);
+		$xdata = array_column($this->data, 0);
+
+		return ['min' => min($xdata), 'max' => max($xdata)];
+	}
+
+	public function yBounds(): array
+	{
+		$ydata = array_column($this->data, 1);
+
+		return ['min' => min($ydata), 'max' => max($ydata)];
+	}
+
+	public function width(): float
+	{
+		$xBounds = $this->xBounds();
+
+		return $xBounds['max'] - $xBounds['min'];
+	}
+
+	public function height(): float
+	{
+		$yBounds = $this->yBounds();
+
+		return $yBounds['max'] - $yBounds['min'];
+	}
+
+	public function draw(Image &$canvas, IAxis $axis): Image
+	{
+		$W = $canvas->width();
+		$H = $canvas->height();
+
+		[$X0, $Y0] = $this->XY($this->data[0][0], $this->data[0][1], $W, $H, $axis);
 
 		foreach ($this->data as $xy) {
-			[$X, $Y] = $this->XY($xy[0], $xy[1], $width, $height, $axis);
+			[$X, $Y] = $this->XY($xy[0], $xy[1], $W, $H, $axis);
 
 			$canvas->line($X0,
 				$Y0,
@@ -43,12 +74,14 @@ class DataSet implements IDataSet
 				});
 			[$X0, $Y0] = [$X, $Y];
 		}
+
+		return $canvas;
 	}
 
-	protected function XY(float $x, float $y, int $width, int $height, IAxis $axis): array
+	protected function XY(float $x, float $y, int $W, int $H, IAxis $axis): array
 	{
-		$X = (float)$width * ($x - $axis->xmin()) / ($axis->xmax() - $axis->xmin());
-		$Y = (float)$height * ($axis->ymax() - $y) / ($axis->ymax() - $axis->ymin());
+		$X = (float)$W * ($x - $axis->xmin()) / ($axis->xmax() - $axis->xmin());
+		$Y = (float)$H * ($axis->ymax() - $y) / ($axis->ymax() - $axis->ymin());
 
 		return [$X, $Y];
 	}

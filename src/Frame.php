@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Marzzelo\Graph;
 
@@ -36,15 +36,5 @@ class Frame implements IFrame
 			});
 
 		return $canvas;
-	}
-
-	public function getHeight(): int
-	{
-		return $this->height_px;
-	}
-
-	public function getWidth(): int
-	{
-		return $this->width_px;
 	}
 }

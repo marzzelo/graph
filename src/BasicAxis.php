@@ -1,5 +1,4 @@
-<?php
-
+<?php declare(strict_types=1);
 
 namespace Marzzelo\Graph;
 
@@ -18,8 +17,6 @@ class BasicAxis implements IAxis
 	protected string $title = '', $xlabel = '', $ylabel = '';
 
 	protected float $stepx = 0, $stepy = 0;
-
-	protected float $w, $h;
 
 	/**
 	 * basicAxis constructor.
@@ -44,24 +41,24 @@ class BasicAxis implements IAxis
 		$this->title = $title;
 	}
 
-	public function addLabels(array $labels)
+	public function addLabels(array $labels): void
 	{
 		$this->xlabel = $labels[0];
 		$this->ylabel = $labels[1];
 	}
 
-	public function setGrid(float $stepx, float $stepy)
+	public function setGrid(float $stepx, float $stepy): void
 	{
 		$this->stepx = $stepx;
 		$this->stepy = $stepy;
 	}
 
-	public function draw(Image $canvas, int $width_px, int $height_px): Image
+	public function draw(Image &$canvas): Image
 	{
-		$this->w = $width_px;
-		$this->h = $height_px;
+		$W = $canvas->width();
+		$H = $canvas->height();
 
-		[$CX, $CY] = $this->XY(0, 0);
+		[$CX, $CY] = $this->XY(0, 0, $W, $H);
 
 		$sx = $this->stepx
 			?: ($this->_xmax - $this->_xmin) / 5;
@@ -70,11 +67,14 @@ class BasicAxis implements IAxis
 
 		// X-GRID
 		for ($i = $nmin; $i < $nsteps; $i++) {
-			[$xn, $yn] = $this->XY($i * $sx, 0);
-			$canvas->line($xn, 0, $xn, $height_px, function ($draw) {
+			[$xn, $yn] = $this->XY($i * $sx, 0, $W, $H);
+			$canvas->line($xn, 0, $xn, $H, function ($draw) {
 				$draw->color = '#DDD';
 			});
-			$canvas->text(sprintf('%.2f', $i * $sx), $xn, $yn - 3);
+			$format = (abs($i * $sx) < 10)
+				? '%.2f'
+				: '%.0f';
+			$canvas->text(sprintf($format, $i * $sx), $xn, $yn - 3);
 		}
 
 		$sy = $this->stepy
@@ -84,28 +84,31 @@ class BasicAxis implements IAxis
 
 		// Y-GRID
 		for ($i = $nmin; $i < $nsteps; $i++) {
-			[$xn, $yn] = $this->XY(0, $i * $sy);
-			$canvas->line(0, $yn, $width_px, $yn, function ($draw) {
+			[$xn, $yn] = $this->XY(0, $i * $sy, $W, $H);
+			$canvas->line(0, $yn, $W, $yn, function ($draw) {
 				$draw->color = '#DDD';
 			});
-			$canvas->text(sprintf('%.2f', $i * $sy), $xn + 3, $yn);
+			$format = (abs($i * $sy) < 10)
+				? '%.2f'
+				: '%.0f';
+			$canvas->text(sprintf($format, $i * $sy), $xn + 3, $yn);
 		}
 
 		// XY-AXIS
-		$canvas->line($CX, 0, $CX, $height_px, function ($draw) {
+		$canvas->line($CX, 0, $CX, $H, function ($draw) {
 			$draw->color('#555');
 		})
-		       ->line(0, $CY, $width_px, $CY, function ($draw) {
+		       ->line(0, $CY, $W, $CY, function ($draw) {
 			       $draw->color('#555');
 		       });
 
 		// TITLE
 		if ($this->title) {
-			$canvas->rectangle(0, 0, $this->w - 1, 18, function ($draw) {
+			$canvas->rectangle(0, 0, $W - 1, 18, function ($draw) {
 				$draw->background('rgba(255, 255, 255, 0.8)');
 				$draw->border(1, 'rgba(128, 128, 128, 0.8)');
 			});
-			$canvas->text($this->title, $this->w / 2, 5, function ($font) {
+			$canvas->text($this->title, $W / 2, 5, function ($font) {
 				$font->file(5);
 				$font->color('#000');
 				$font->align('center');
@@ -115,7 +118,7 @@ class BasicAxis implements IAxis
 
 		// X-LABEL
 		if ($this->xlabel) {
-			$canvas->text($this->xlabel, $this->w - 10, $this->XY(0, 0)[1] + 3, function ($font) {
+			$canvas->text($this->xlabel, $W - 10, $this->XY(0, 0, $W, $H)[1] + 3, function ($font) {
 				$font->file(2);
 				$font->color('#000');
 				$font->align('right');
@@ -125,7 +128,7 @@ class BasicAxis implements IAxis
 
 		// Y-LABEL
 		if ($this->ylabel) {
-			$canvas->text($this->ylabel, $this->XY(0, 0)[0] + 3, 24, function ($font) {
+			$canvas->text($this->ylabel, $this->XY(0, 0, $W, $H)[0] + 3, 24, function ($font) {
 				$font->file(2);
 				$font->color('#000');
 				$font->align('left');
@@ -136,11 +139,10 @@ class BasicAxis implements IAxis
 		return $canvas;
 	}
 
-	public function XY(float $x, float $y): array
+	private function XY(float $x, float $y, int $W, int $H): array
 	{
-		$X = intval($this->w * ($x - $this->_xmin) / ($this->_xmax - $this->_xmin));
-		$Y = intval($this->h * ($this->_ymax - $y) / ($this->_ymax - $this->_ymin));
-
+		$X = intval($W * ($x - $this->_xmin) / ($this->_xmax - $this->_xmin));
+		$Y = intval($H * ($this->_ymax - $y) / ($this->_ymax - $this->_ymin));
 		return [$X, $Y];
 	}
 

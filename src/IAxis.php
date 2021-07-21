@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 
 namespace Marzzelo\Graph;
@@ -16,5 +17,9 @@ interface IAxis
 
 	public function ymax(): float;
 
-	public function draw(Image $canvas, int $width_px, int $height_px): Image;
+	public function draw(Image &$canvas): Image;
+
+	public function setGrid(float $stepx, float $stepy): void;
+
+	public function addLabels(array $labels): void;
 }

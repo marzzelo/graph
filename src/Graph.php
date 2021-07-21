@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Marzzelo\Graph;
 
@@ -11,9 +11,7 @@ class Graph
 	/**
 	 * @var \Marzzelo\Graph\IDataSet[]
 	 */
-	private array $series;
-
-	private Image $canvas;
+	private array $series = [];
 
 	private IFrame $frame;
 
@@ -22,7 +20,6 @@ class Graph
 	{
 		$this->frame = $frame;
 		$this->axis = $axis;
-		$this->canvas = $frame->getCanvas();
 	}
 
 	public function addDataSet(IDataSet $dataSet)
@@ -35,23 +32,24 @@ class Graph
 	 */
 	public function addDataSets(array $dataSets)
 	{
-		$this->series = $dataSets;
+		$this->series = array_merge($this->series, $dataSets);
 	}
 
 	public function render(): Image
 	{
-		$this->axis->draw($this->canvas, $this->frame->getWidth(), $this->frame->getHeight());
+		$canvas = $this->frame->getCanvas();
+		$this->axis->draw($canvas);
 
 		foreach ($this->series as $dataSet) {
-			$dataSet->draw($this->canvas, $this->axis, $this->frame->getWidth(), $this->frame->getHeight());
+			$dataSet->draw($canvas, $this->axis);
 		}
 
-		return $this->canvas;
+		return $canvas;
 	}
 
 	public function render64(string $format = 'png'): string
 	{
-		$img64 = base64_encode($this->render()->encode($format));
+		$img64 = base64_encode((string) $this->render()->encode($format));
 
 		return "data:image/$format;base64,$img64";
 	}
