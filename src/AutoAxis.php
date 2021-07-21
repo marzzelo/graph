@@ -34,6 +34,7 @@ class AutoAxis extends BasicAxis implements IAxis
 		$ym = (float)min($datay);
 		$yM = (float)max($datay);
 
+		// dd([$xm, $xM, $ym, $yM]);
 		return [$xm, $xM, $ym, $yM];
 	}
 
