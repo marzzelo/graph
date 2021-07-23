@@ -5,19 +5,21 @@ declare(strict_types=1);
 namespace Marzzelo\Graph;
 
 
+use Intervention\Image\Image;
+
 class AutoAxis extends BasicAxis implements IAxis
 {
 	/**
 	 * AutoAxis constructor.
-	 * @param array     $series Array of arrays of [x, y]:  [ $dataset1,  [[0,3],[1,4],[2,7]], ..., $dataset_n ].
-	 * @param float|int $margin Margin from canvas border to Series curves
-	 * @param string    $title  Graph main title
+	 * @param array                     $series Array of arrays of [x, y]:  [ $dataset1,  [[0,3],[1,4],[2,7]], ..., $dataset_n ].
+	 * @param \Intervention\Image\Image $canvas
+	 * @param float|int                 $margin Margin from canvas border to Series curves
 	 */
-	public function __construct(array $series, float $margin = 20, string $title = '')
+	public function __construct(array $series, Image &$canvas, float $margin = 20)
 	{
 		[$xm, $xM, $ym, $yM] = $this->endpoints($series);
 
-		parent::__construct($xm, $xM, $ym, $yM, $margin, $title);
+		parent::__construct($xm, $xM, $ym, $yM, $canvas, $margin);
 	}
 
 

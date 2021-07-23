@@ -17,9 +17,17 @@ interface IAxis
 
 	public function ymax(): float;
 
-	public function draw(Image &$canvas): Image;
+	// public function getWidth(): int;
+	//
+	// public function getHeight(): int;
 
-	public function setGrid(float $stepx, float $stepy): void;
+	public function getCanvas(): Image;
 
-	public function addLabels(array $labels): void;
+	public function XY(float $x, float $y): array;
+
+	public function draw(): Image;
+
+	public function setGrid(float $stepx, float $stepy): self;
+
+	public function addLabels(string $labelx, string $labely, string $title = ''): self;
 }

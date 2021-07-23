@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 
 namespace Marzzelo\Graph;
@@ -49,40 +50,24 @@ class DataSet implements IDataSet
 		return $yBounds['max'] - $yBounds['min'];
 	}
 
-	public function draw(Image &$canvas, IAxis $axis): Image
+	public function draw(IAxis $axis): Image
 	{
-		$W = $canvas->width();
-		$H = $canvas->height();
+		$canvas = $axis->getCanvas();
 
-		[$X0, $Y0] = $this->XY($this->data[0][0], $this->data[0][1], $W, $H, $axis);
+		[$X0, $Y0] = $axis->XY($this->data[0][0], $this->data[0][1]);
 
 		foreach ($this->data as $xy) {
-			[$X, $Y] = $this->XY($xy[0], $xy[1], $W, $H, $axis);
+			[$X, $Y] = $axis->XY($xy[0], $xy[1]);
 
-			$canvas->line($X0,
-				$Y0,
-				$X,
-				$Y,
-				function ($draw) {
-					$draw->color($this->color);
-				});
-			$canvas->circle($this->radius,
-				$X,
-				$Y,
-				function ($draw) {
-					$draw->background($this->color);
-				});
+			$canvas->line($X0, $Y0, $X, $Y, function ($draw) {
+				$draw->color($this->color);
+			});
+			$canvas->circle($this->radius, $X, $Y, function ($draw) {
+				$draw->background($this->color);
+			});
 			[$X0, $Y0] = [$X, $Y];
 		}
 
 		return $canvas;
-	}
-
-	protected function XY(float $x, float $y, int $W, int $H, IAxis $axis): array
-	{
-		$X = (float)$W * ($x - $axis->xmin()) / ($axis->xmax() - $axis->xmin());
-		$Y = (float)$H * ($axis->ymax() - $y) / ($axis->ymax() - $axis->ymin());
-
-		return [$X, $Y];
 	}
 }

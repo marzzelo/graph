@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Marzzelo\Graph;
 
@@ -14,6 +15,8 @@ class BasicAxis implements IAxis
 
 	private float $_ymax;
 
+	private Image $canvas;
+
 	protected string $title = '', $xlabel = '', $ylabel = '';
 
 	protected float $stepx = 0, $stepy = 0;
@@ -23,7 +26,7 @@ class BasicAxis implements IAxis
 	 * @param float $margin Margin percentage
 	 */
 	// public function __construct(XYPoint $ul, XYPoint $lr, float $margin = 20, string $title = '')
-	public function __construct(float $xm, float $xM, float $ym, float $yM, float $margin = 20, string $title = '')
+	public function __construct(float $xm, float $xM, float $ym, float $yM, Image &$canvas, float $margin = 20)
 	{
 		if (($xm == $xM) || ($ym == $yM)) {
 			// dd($xm, $xM, $ym, $yM);
@@ -38,27 +41,30 @@ class BasicAxis implements IAxis
 		$this->_ymin = $ym - $margin / 100 * $dy;
 		$this->_ymax = $yM + $margin / 100 * $dy;
 
-		$this->title = $title;
+		$this->canvas = $canvas;
 	}
 
-	public function addLabels(array $labels): void
+	public function addLabels(string $labelx, string $labely, string $title = ''): self
 	{
-		$this->xlabel = $labels[0];
-		$this->ylabel = $labels[1];
+		$this->xlabel = $labelx;
+		$this->ylabel = $labely;
+		$this->title = $title;
+		return $this;
 	}
 
-	public function setGrid(float $stepx, float $stepy): void
+	public function setGrid(float $stepx, float $stepy): self
 	{
 		$this->stepx = $stepx;
 		$this->stepy = $stepy;
+		return $this;
 	}
 
-	public function draw(Image &$canvas): Image
+	public function draw(): Image
 	{
-		$W = $canvas->width();
-		$H = $canvas->height();
+		$W = $this->canvas->width();
+		$H = $this->canvas->height();
 
-		[$CX, $CY] = $this->XY(0, 0, $W, $H);
+		[$CX, $CY] = $this->XY(0, 0);
 
 		$sx = $this->stepx
 			?: ($this->_xmax - $this->_xmin) / 5;
@@ -67,14 +73,14 @@ class BasicAxis implements IAxis
 
 		// X-GRID
 		for ($i = $nmin; $i < $nsteps; $i++) {
-			[$xn, $yn] = $this->XY($i * $sx, 0, $W, $H);
-			$canvas->line($xn, 0, $xn, $H, function ($draw) {
+			[$xn, $yn] = $this->XY($i * $sx, 0);
+			$this->canvas->line($xn, 0, $xn, $H, function ($draw) {
 				$draw->color = '#DDD';
 			});
 			$format = (abs($i * $sx) < 10)
 				? '%.2f'
 				: '%.0f';
-			$canvas->text(sprintf($format, $i * $sx), $xn, $yn - 3);
+			$this->canvas->text(sprintf($format, $i * $sx), $xn, $yn - 3);
 		}
 
 		$sy = $this->stepy
@@ -84,18 +90,18 @@ class BasicAxis implements IAxis
 
 		// Y-GRID
 		for ($i = $nmin; $i < $nsteps; $i++) {
-			[$xn, $yn] = $this->XY(0, $i * $sy, $W, $H);
-			$canvas->line(0, $yn, $W, $yn, function ($draw) {
+			[$xn, $yn] = $this->XY(0, $i * $sy);
+			$this->canvas->line(0, $yn, $W, $yn, function ($draw) {
 				$draw->color = '#DDD';
 			});
 			$format = (abs($i * $sy) < 10)
 				? '%.2f'
 				: '%.0f';
-			$canvas->text(sprintf($format, $i * $sy), $xn + 3, $yn);
+			$this->canvas->text(sprintf($format, $i * $sy), $xn + 3, $yn);
 		}
 
 		// XY-AXIS
-		$canvas->line($CX, 0, $CX, $H, function ($draw) {
+		$this->canvas->line($CX, 0, $CX, $H, function ($draw) {
 			$draw->color('#555');
 		})
 		       ->line(0, $CY, $W, $CY, function ($draw) {
@@ -104,11 +110,11 @@ class BasicAxis implements IAxis
 
 		// TITLE
 		if ($this->title) {
-			$canvas->rectangle(0, 0, $W - 1, 18, function ($draw) {
+			$this->canvas->rectangle(0, 0, $W - 1, 18, function ($draw) {
 				$draw->background('rgba(255, 255, 255, 0.8)');
 				$draw->border(1, 'rgba(128, 128, 128, 0.8)');
 			});
-			$canvas->text($this->title, $W / 2, 5, function ($font) {
+			$this->canvas->text($this->title, $W / 2, 5, function ($font) {
 				$font->file(5);
 				$font->color('#000');
 				$font->align('center');
@@ -118,7 +124,7 @@ class BasicAxis implements IAxis
 
 		// X-LABEL
 		if ($this->xlabel) {
-			$canvas->text($this->xlabel, $W - 10, $this->XY(0, 0, $W, $H)[1] + 3, function ($font) {
+			$this->canvas->text($this->xlabel, $W - 10, $this->XY(0, 0)[1] + 3, function ($font) {
 				$font->file(2);
 				$font->color('#000');
 				$font->align('right');
@@ -128,7 +134,7 @@ class BasicAxis implements IAxis
 
 		// Y-LABEL
 		if ($this->ylabel) {
-			$canvas->text($this->ylabel, $this->XY(0, 0, $W, $H)[0] + 3, 24, function ($font) {
+			$this->canvas->text($this->ylabel, $this->XY(0, 0)[0] + 3, 24, function ($font) {
 				$font->file(2);
 				$font->color('#000');
 				$font->align('left');
@@ -136,13 +142,13 @@ class BasicAxis implements IAxis
 			});
 		}
 
-		return $canvas;
+		return $this->canvas;
 	}
 
-	private function XY(float $x, float $y, int $W, int $H): array
+	public function XY(float $x, float $y): array
 	{
-		$X = intval($W * ($x - $this->_xmin) / ($this->_xmax - $this->_xmin));
-		$Y = intval($H * ($this->_ymax - $y) / ($this->_ymax - $this->_ymin));
+		$X = intval($this->canvas->width() * ($x - $this->_xmin) / ($this->_xmax - $this->_xmin));
+		$Y = intval($this->canvas->height() * ($this->_ymax - $y) / ($this->_ymax - $this->_ymin));
 		return [$X, $Y];
 	}
 
@@ -164,5 +170,19 @@ class BasicAxis implements IAxis
 	public function ymax(): float
 	{
 		return $this->_ymax;
+	}
+
+	// public function getWidth(): int
+	// {
+	// 	return $this->canvas->width();
+	// }
+	//
+	// public function getHeight(): int
+	// {
+	// 	return $this->canvas->height();
+	// }
+	public function getCanvas(): Image
+	{
+		return $this->canvas;
 	}
 }

@@ -6,14 +6,14 @@ use Intervention\Image\Image;
 
 class Graph
 {
+	private IFrame $frame;
+
 	private IAxis $axis;
 
 	/**
 	 * @var \Marzzelo\Graph\IDataSet[]
 	 */
 	private array $series = [];
-
-	private IFrame $frame;
 
 
 	public function __construct(IFrame $frame, IAxis $axis)
@@ -37,11 +37,10 @@ class Graph
 
 	public function render(): Image
 	{
-		$canvas = $this->frame->getCanvas();
-		$this->axis->draw($canvas);
+		$canvas = $this->axis->draw();
 
 		foreach ($this->series as $dataSet) {
-			$dataSet->draw($canvas, $this->axis);
+			$dataSet->draw($this->axis);
 		}
 
 		return $canvas;
