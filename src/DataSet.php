@@ -50,7 +50,7 @@ class DataSet implements IDataSet
 		return $yBounds['max'] - $yBounds['min'];
 	}
 
-	public function draw(IAxis $axis): Image
+	public function draw(IAxis &$axis): Image
 	{
 		$canvas = $axis->getCanvas();
 

@@ -6,8 +6,6 @@ use Intervention\Image\Image;
 
 class Graph
 {
-	private IFrame $frame;
-
 	private IAxis $axis;
 
 	/**
@@ -16,9 +14,8 @@ class Graph
 	private array $series = [];
 
 
-	public function __construct(IFrame $frame, IAxis $axis)
+	public function __construct(IAxis $axis)
 	{
-		$this->frame = $frame;
 		$this->axis = $axis;
 	}
 
@@ -30,17 +27,18 @@ class Graph
 	/**
 	 * @param \Marzzelo\Graph\IDataSet[] $dataSets
 	 */
-	public function addDataSets(array $dataSets)
+	public function addDataSets(array $dataSets): self
 	{
 		$this->series = array_merge($this->series, $dataSets);
+		return $this;
 	}
 
 	public function render(): Image
 	{
-		$canvas = $this->axis->draw();
+		$canvas = $this->axis->draw();  // ejes, grilla, labels, title
 
 		foreach ($this->series as $dataSet) {
-			$dataSet->draw($this->axis);
+			$dataSet->draw($this->axis);    // points, curves
 		}
 
 		return $canvas;

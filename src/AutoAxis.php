@@ -15,11 +15,11 @@ class AutoAxis extends BasicAxis implements IAxis
 	 * @param \Intervention\Image\Image $canvas
 	 * @param float|int                 $margin Margin from canvas border to Series curves
 	 */
-	public function __construct(array $series, Image &$canvas, float $margin = 20)
+	public function __construct(array $series, Frame &$frame, float $margin = 20)
 	{
 		[$xm, $xM, $ym, $yM] = $this->endpoints($series);
 
-		parent::__construct($xm, $xM, $ym, $yM, $canvas, $margin);
+		parent::__construct($xm, $xM, $ym, $yM, $frame, $margin);
 	}
 
 
