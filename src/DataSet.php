@@ -15,7 +15,7 @@ class DataSet implements IDataSet
 
 	private string $color;
 
-	public function __construct(array $data, int $radius, string $color)
+	public function __construct(array $data, int $radius = 0, string $color = '#00A')
 	{
 		$this->data = $data;
 		$this->radius = $radius;
@@ -62,9 +62,11 @@ class DataSet implements IDataSet
 			$canvas->line($X0, $Y0, $X, $Y, function ($draw) {
 				$draw->color($this->color);
 			});
-			$canvas->circle($this->radius, $X, $Y, function ($draw) {
-				$draw->background($this->color);
-			});
+			if ($this->radius) {
+				$canvas->circle($this->radius, $X, $Y, function ($draw) {
+					$draw->background($this->color);
+				});
+			}
 			[$X0, $Y0] = [$X, $Y];
 		}
 

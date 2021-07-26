@@ -29,7 +29,6 @@ class BasicAxis implements IAxis
 	public function __construct(float $xm, float $xM, float $ym, float $yM, Frame &$frame, float $margin = 20)
 	{
 		if (($xm == $xM) || ($ym == $yM)) {
-			// dd($xm, $xM, $ym, $yM);
 			throw new \InvalidArgumentException('WIDTH OR HEIGHT CAN NOT BE ZERO');
 		}
 
@@ -44,10 +43,15 @@ class BasicAxis implements IAxis
 		$this->canvas = $frame->getCanvas();
 	}
 
-	public function addLabels(string $labelx, string $labely, string $title = ''): self
+	public function addLabels(array $labels): self
 	{
-		$this->xlabel = $labelx;
-		$this->ylabel = $labely;
+		$this->xlabel = $labels[0];
+		$this->ylabel = $labels[1];
+		return $this;
+	}
+
+	public function addTitle(string $title): IAxis
+	{
 		$this->title = $title;
 		return $this;
 	}

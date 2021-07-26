@@ -13,6 +13,8 @@ class Graph
 	 */
 	private array $series = [];
 
+	private array $headers = [];
+
 
 	public function __construct(IAxis $axis)
 	{
@@ -35,6 +37,9 @@ class Graph
 
 	public function render(): Image
 	{
+		if($this->headers) {
+			$this->axis->addLabels($this->headers);
+		}
 		$canvas = $this->axis->draw();  // ejes, grilla, labels, title
 
 		foreach ($this->series as $dataSet) {
