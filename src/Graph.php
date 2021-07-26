@@ -55,4 +55,9 @@ class Graph
 
 		return "data:image/$format;base64,$img64";
 	}
+
+	public static function confineTo(float $x, float $min, float $max): float
+	{
+		return min(max($min, $x), $max);
+	}
 }

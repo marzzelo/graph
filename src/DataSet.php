@@ -22,6 +22,12 @@ class DataSet implements IDataSet
 		$this->color = $color;
 	}
 
+	public function setMarker(int $radius = 0, string $color = '#00A')
+	{
+		$this->radius = $radius;
+		$this->color = $color;
+	}
+
 	public function xBounds(): array
 	{
 		$xdata = array_column($this->data, 0);

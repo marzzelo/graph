@@ -37,9 +37,9 @@ class CsvStringReader implements IReader
 	private array $headers = [];
 
 	/**
-	 * @var DataSet[] $series
+	 * @var DataSet[] $dataSets
 	 */
-	private array $series = [];
+	private array $dataSets = [];
 
 
 	public function __construct(string $csvString, string $delimiter = "\t", bool $hasHeaders = true)
@@ -71,14 +71,14 @@ class CsvStringReader implements IReader
 		}
 
 		foreach ($series as $serie) {
-			$this->series[] = new DataSet($serie);
+			$this->dataSets[] = new DataSet($serie);
 		}
 
 	}
 
-	public function getSeries(): array
+	public function getDataSets(): array
 	{
-		return $this->series;
+		return $this->dataSets;
 	}
 
 
@@ -115,4 +115,6 @@ class CsvStringReader implements IReader
 
 		// [ "x" => "time", "y" => "distance, velocity" ]
 	}
+
+
 }

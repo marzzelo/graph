@@ -128,24 +128,34 @@ class BasicAxis implements IAxis
 		}
 
 		// X-LABEL
+		// @formatter:off
 		if ($this->xlabel) {
-			$canvas->text($this->xlabel, $W - 10, $this->XY(0, 0)[1] + 3, function ($font) {
-				$font->file(2);
-				$font->color('#000');
-				$font->align('right');
-				$font->valign('top');
-			});
+			$canvas->text(
+				$this->xlabel,
+				$W - 10,
+				(int) Graph::confineTo($this->XY(0, 0)[1] + 3, 0,  $this->canvas->height() - 20),
+				function ($font) {
+						$font->file(2);
+						$font->color('#000');
+						$font->align('right');
+						$font->valign('top');
+				});
 		}
 
 		// Y-LABEL
 		if ($this->ylabel) {
-			$canvas->text($this->ylabel, $this->XY(0, 0)[0] + 3, 24, function ($font) {
-				$font->file(2);
-				$font->color('#000');
-				$font->align('left');
-				$font->valign('top');
-			});
+			$canvas->text(
+				$this->ylabel,
+				(int)Graph::confineTo($this->XY(0, 0)[0] + 3, 3, $this->canvas->width() - 50),
+				24,
+				function ($font) {
+					$font->file(2);
+					$font->color('#000');
+					$font->align('left');
+					$font->valign('top');
+				});
 		}
+		// @formatter:on
 
 		return $canvas;
 	}
