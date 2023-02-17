@@ -1,8 +1,6 @@
 {
   "name": "marzzelo/graph",
-  "version": "0.0.1",
   "description": "Little cartesian graphics generator",
-  "type": "library",
   "license": "MIT",
   "authors": [
     {
