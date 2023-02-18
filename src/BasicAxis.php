@@ -33,9 +33,7 @@ class BasicAxis implements IAxis
 	 * @param  \Marzzelo\Graph\Frame|null  $frame  Frame object
 	 * @param  integer|array               $margin  from canvas border to Series curves
 	 */
-	public function __construct(float $xm = -100.0, float $xM = 100.0, float $ym = -100.0, float $yM = 100.0, Frame
-	&$frame = null,
-		$margin =	20)
+	public function __construct(float $xm, float $xM, float $ym, float $yM, Frame &$frame,	$margin =	20)
 	{
 		$this->configure($xm, $xM, $ym, $yM, $frame, $margin);
 	}

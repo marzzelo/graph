@@ -23,7 +23,7 @@ $data2 = [[-1500, 1200], [-1000, 1000], [-500, 200], [0, 0], [1000, 1100], [1500
 ...
 $dataN = [...];
 ```
-- Create the datasets using the class **DataSet**. 
+- Create the datasets using the class **DataSet**. Optionally, you can define the _marker radius_ and _line color_.
 ```php
 $dataset1 = new DataSet($data1, 6, '#070');
 $dataset2 = new DataSet($data2, 8, '#600');
@@ -32,7 +32,7 @@ $datasetN = new DataSet($dataN, 8, '#600');
 ```
 
 - Define a _frame_ as a canvas for the the Graph using the class **Frame**. Input the
-width, height, background-color and border-color. 
+width, height and, optionally, background-color and border-color. 
 ```php
 $frame = new Frame(640, 400, '#FFF', '#bbb');
 ```
@@ -56,7 +56,7 @@ $graph = (new Graph($axis))
              $dataset1,
              $dataset2,
          ])    
-// Get the image to display (render64) or save: $graph->render()->save(Storage::path('images/rectangle.png'))
+// Get the image to display (render64)
         ->render64('png');
         
 // Or, save the image to a file
@@ -91,8 +91,21 @@ Then, you can use `$img64` content as the `image source` in the `<img />` html t
 ![from CSV file](tests/graph_csv.png "graph from CSV file")
 
 ```php
-$csvFile = new CsvFileReader($this->source, ",");
-$this->datasets = $csvFile->getDataSets();
+$csvFile = new CsvFileReader('data.csv', ",");  // create the CSV file reader
+$datasets = $csvFile->getDataSets(); // get the data sets
+
+$datasets[0]->setMarker(5, '#a00'); // set marker radius and color
+$datasets[1]->setMarker(5, '#070');
+
+$frame = new Frame(640, 400);  // create the frame
+$axis = (new AutoAxis($datasets, $frame ))  // create the axis
+    ->addLabels('time[s]', 'current[A], voltage[V]')
+    ->setGrid(200, 100);
+    ->addTitle('Current and voltage vs time');
+    
+(new Graph($axis))  
+	->addDataSets($datasets) // add the datasets to the graph
+	->render()->save('graph/testgraph.png');  // save the graph to a file
 ```
 
 ## Contributing

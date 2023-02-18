@@ -20,11 +20,11 @@ class Frame implements IFrame
 	public function __construct(int $width_px = 800, int $height_px = 600, string $background_color = '#FFD',
 		string $frame_color = '#BBB')
 	{
-		$this->configure($width_px, $height_px, $background_color, $frame_color);
+		$this->make($width_px, $height_px, $background_color, $frame_color);
 	}
 
-	public function configure(int $width_px, int $height_px, string $background_color = '#FFF', string $frame_color =
-	'#FFF'): self
+	public function make(int $width_px, int $height_px, string $background_color = '#FFd', string $frame_color =
+	'#BBB'): self
 	{
 		$this->width_px = $width_px;
 		$this->height_px = $height_px;
