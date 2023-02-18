@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Marzzelo\Graph;
 
-
 use Intervention\Image\Image;
 
 class DataSet implements IDataSet
@@ -15,7 +14,7 @@ class DataSet implements IDataSet
 
 	private string $color;
 
-	public function __construct(array $data, int $radius = 0, string $color = '#00A')
+	public function __construct(array $data = [], int $radius = 0, string $color = '#0AA')
 	{
 		$this->data = $data;
 		$this->radius = $radius;
@@ -56,7 +55,7 @@ class DataSet implements IDataSet
 		return $yBounds['max'] - $yBounds['min'];
 	}
 
-	public function draw(IAxis &$axis): Image
+	public function draw(IAxis $axis): Image
 	{
 		$canvas = $axis->getCanvas();
 

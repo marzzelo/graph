@@ -11,10 +11,12 @@ class AutoAxis extends BasicAxis implements IAxis
 {
 	/**
 	 * AutoAxis constructor.
-	 * @param \Marzzelo\Graph\DataSet[] $dataSets
-	 * @param float|int                 $margin Margin from canvas border to Series curves
+	 *
+	 * @param  array                  $dataSets     Array of points [[x0,y0], [x1,y1], ...]
+	 * @param  \Marzzelo\Graph\Frame  $frame        Frame object
+	 * @param  float|int              $margin       Margin from canvas border to Series curves
 	 */
-	public function __construct(array $dataSets, Frame &$frame, float $margin = 20)
+	public function __construct(array $dataSets, Frame &$frame, $margin = 20)
 	{
 		[$xm, $xM, $ym, $yM] = $this->endpoints($dataSets);
 

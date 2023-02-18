@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Marzzelo\Graph;
 
@@ -16,12 +17,21 @@ class Frame implements IFrame
 	private string $frame_color;
 
 
-	public function __construct(int $width_px, int $height_px, string $background_color, string $frame_color = 'rgba(255, 255, 255, 0)')
+	public function __construct(int $width_px = 800, int $height_px = 600, string $background_color = '#FFD',
+		string $frame_color = '#BBB')
+	{
+		$this->configure($width_px, $height_px, $background_color, $frame_color);
+	}
+
+	public function configure(int $width_px, int $height_px, string $background_color = '#FFF', string $frame_color =
+	'#FFF'): self
 	{
 		$this->width_px = $width_px;
 		$this->height_px = $height_px;
 		$this->background_color = $background_color;
 		$this->frame_color = $frame_color;
+
+		return $this;
 	}
 
 	public function getCanvas(): Image
