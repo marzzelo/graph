@@ -117,7 +117,7 @@ Don't need to install anything. Autodiscovery is enabled.
 
 To create a Frame, use the `Frame` facade:
 ```php
-$frame = Frame::configure(640, 400, '#FFF', '#bbb'); // create the frame
+$frame = Frame::make(640, 400, '#FFF', '#bbb'); // create the frame
 ```
 
 You can also get a Frame instance using the Graph facade:

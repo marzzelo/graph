@@ -73,29 +73,29 @@ class Graph
 	}
 
 	// Factory a Frame object
-	public static function Frame(int $width_px = 800, int $height_px = 600, string $background_color = '#FFD',
+	public static function getFrame(int $width_px = 800, int $height_px = 600, string $background_color = '#FFD',
 		string $frame_color = '#BBB'): Frame
 	{
 		return new Frame($width_px, $height_px, $background_color, $frame_color);
 	}
 
-	public static function DataSet(array $data, int $radius = 0, string $color = '#0AA'): DataSet
+	public static function getDataSet(array $data, int $radius = 0, string $color = '#0AA'): DataSet
 	{
 		return new DataSet($data, $radius, $color);
 	}
 
-	public static function BasicAxis(float $xm, float $xM, float $ym, float $yM, Frame &$frame, $margin = 20):
+	public static function getBasicAxis(float $xm, float $xM, float $ym, float $yM, Frame &$frame, $margin = 20):
 	BasicAxis
 	{
 		return new BasicAxis($xm, $xM, $ym, $yM, $frame, $margin);
 	}
 
-	public static function AutoAxis(array $dataSets, Frame &$frame, $margin = 20): AutoAxis
+	public static function getAutoAxis(array $dataSets, Frame &$frame, $margin = 20): AutoAxis
 	{
 		return new AutoAxis($dataSets, $frame, $margin);
 	}
 
-	public static function CsvFileReader(string $csvFile, string $delimiter = "\t", bool $hasHeaders = true):
+	public static function getCsvFileReader(string $csvFile, string $delimiter = "\t", bool $hasHeaders = true):
 	CsvFileReader
 	{
 		return new CsvFileReader($csvFile, $delimiter, $hasHeaders);
