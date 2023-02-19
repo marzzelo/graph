@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Marzzelo\Graph;
 
@@ -36,7 +37,7 @@ class Graph
 	}
 
 	/**
-	 * @param \Marzzelo\Graph\IDataSet[] $dataSets
+	 * @param  \Marzzelo\Graph\IDataSet[]  $dataSets
 	 */
 	public function addDataSets(array $dataSets): self
 	{
@@ -52,7 +53,7 @@ class Graph
 
 	public function render(): Image
 	{
-		if($this->headers) {
+		if ($this->headers) {
 			$this->axis->addLabels($this->headers);
 		}
 		$canvas = $this->axis->draw();  // ejes, grilla, labels, title
@@ -66,13 +67,13 @@ class Graph
 
 	public function render64(string $format = 'png'): string
 	{
-		$img64 = base64_encode((string) $this->render()->encode($format));
+		$img64 = base64_encode((string)$this->render()->encode($format));
 
 		return "data:image/$format;base64,$img64";
 	}
 
 	// Factory a Frame object
-	public static function frame(int $width_px = 800, int $height_px = 600, string $background_color = '#FFD',
+	public static function Frame(int $width_px = 800, int $height_px = 600, string $background_color = '#FFD',
 		string $frame_color = '#BBB'): Frame
 	{
 		return new Frame($width_px, $height_px, $background_color, $frame_color);
@@ -83,16 +84,22 @@ class Graph
 		return new DataSet($data, $radius, $color);
 	}
 
-	public function BasicAxis(float $xm, float $xM, float $ym, float $yM, Frame &$frame, $margin =	20): BasicAxis
+	public static function BasicAxis(float $xm, float $xM, float $ym, float $yM, Frame &$frame, $margin = 20):
+	BasicAxis
 	{
 		return new BasicAxis($xm, $xM, $ym, $yM, $frame, $margin);
 	}
 
-	public function AutoAxis(array $dataSets, Frame &$frame, $margin = 20): AutoAxis
+	public static function AutoAxis(array $dataSets, Frame &$frame, $margin = 20): AutoAxis
 	{
 		return new AutoAxis($dataSets, $frame, $margin);
 	}
 
+	public static function CsvFileReader(string $csvFile, string $delimiter = "\t", bool $hasHeaders = true):
+	CsvFileReader
+	{
+		return new CsvFileReader($csvFile, $delimiter, $hasHeaders);
+	}
 
 	public static function confineTo(float $x, float $min, float $max): float
 	{

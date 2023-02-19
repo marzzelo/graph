@@ -1,6 +1,6 @@
 # Marzzelo/Graph
 
-Marzzelo/Graph is a simple Cartesian Graph creation library in PHP.
+Marzzelo/Graph is a simple Cartesian Graph creation library in PHP, with Laravel support.
 
 ![Single dataset plot](./screenshot1.png "graph") 
 
@@ -107,6 +107,54 @@ $axis = (new AutoAxis($datasets, $frame ))  // create the axis
 	->addDataSets($datasets) // add the datasets to the graph
 	->render()->save('graph/testgraph.png');  // save the graph to a file
 ```
+
+## Laravel support
+
+### Installation
+Don't need to install anything. Autodiscovery is enabled.
+
+### Usage
+
+To create a Frame, use the `Frame` facade:
+```php
+$frame = Frame::configure(640, 400, '#FFF', '#bbb'); // create the frame
+```
+
+You can also get a Frame instance using the Graph facade:
+```php
+$frame = Graph::Frame(640, 400, '#FFF', '#bbb'); // create the frame
+```
+
+to create the DataSets, use the `DataSet` facade, or the `Graph` facade:
+```php
+$data1 = [[-1500, 1000], [-1000, 800], [-500, 100], [0, -100], [1000, 900], [1500, 1200]];
+$data2 = [[-1500, 1200], [-1000, 1000], [-500, 200], [0, 0], [1000, 1100], [1500, 1400]];
+
+$dataset1 = Graph::DataSet($data1, 8, '#F00'); // create the dataset
+$dataset2 = Graph::DataSet($data2, 8, '#F0F');
+```
+
+Or, get the data from a CSV file using the `Graph` facade:
+```php
+$csvFile = Graph::CsvFileReader($source, $sep);  // create the CSV file reader
+$datasets = $csvFile->getDataSets(); // get the data sets
+```
+
+The same applies to the Axis and Graph facades:
+```php
+$axis = Graph::AutoAxis([$dataset1, $dataset2], $frame, [5, 10]) // Create the axis and set the grid spacing
+	->addLabels(['time[s]', 'current[A], voltage[V]']) // Add labels to the axis
+	->setGrid($gridx, $gridy) // Set the grid spacing
+	->addTitle($title); // Add a title to the graph
+```
+
+Finally, to create a Graph, use the `Graph` facade:
+```php
+ Graph::make($axis)  // Create the graph
+    ->setDataSets($this->datasets)  // Add the datasets
+    ->render()->save($destination);  // Save the graph to a file
+```
+
 
 ## Contributing
 
