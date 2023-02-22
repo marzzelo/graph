@@ -7,7 +7,30 @@ use Intervention\Image\Image;
 
 class Graph
 {
+    private array $options = [
+        'frame.width_px' => 640,
+        'frame.height_px' => 400,
+        'frame.background_color' => '#FFE',
+        'frame.frame_color' => '#bbb',
+
+        'axis.grid' => [],
+        'axis.labels' => [],
+        'axis.margin' => 20,
+        'axis.title' => '',
+
+        'dataset.marker-radius' => [],
+        'dataset.marker-color' => [],
+
+        'csv.separator' => ',',
+        'csv.skip' => 0,
+        'csv.path' => '',
+    ];
+
+    private ?IFrame $frame = null;
+
 	private ?IAxis $axis = null;
+
+    private array $data = [];
 
 	/**
 	 * @var \Marzzelo\Graph\IDataSet[]
@@ -17,10 +40,57 @@ class Graph
 	private array $headers = [];
 
 
-	public function __construct(IAxis $axis)
+    /*******************************************************************
+     * Graph constructor.
+     * @param IAxis|null $axis
+     *******************************************************************/
+	public function __construct(?IAxis $axis = null)
 	{
-		$this->axis = $axis;
+		if ($axis)
+            $this->make($axis);
 	}
+
+    public function make(IAxis $axis) {
+        $this->axis = $axis;
+        return $this;
+    }
+
+    public function addOptions(array $options) {
+        // update $this->options with new $options:
+        $this->options = array_merge($this->options, $options);
+    }
+
+    /**
+     * @param array $data 2D array of data in the form [[t, x, y, z], [t, x, y, z], ...]
+     * @param array $options array of options
+     */
+    public function fromArray(array $data, array $options = []) {
+        
+        $this->addOptions($options);
+
+        $this->frame = new Frame(
+            $options['frame.width_px'] ?? 640, // ToDo: use config('graph.frame.width_px')
+            $options['frame.height_px'] ?? 400,
+            $options['frame.background_color'] ?? '#FFE', 
+            $options['frame.frame_color'] ?? '#bbb'
+        );
+
+        $this->axis = new AutoAxis(
+            $data,
+            $this->frame,
+            $options['axis.margin'] ?? 20            
+        );
+			
+        $this->axis->addLabels($this->headers);
+		
+		$canvas = $this->axis->draw();  // ejes, grilla, labels, title
+
+		foreach ($this->series as $dataSet) {
+			$dataSet->draw($this->axis);    // points, curves
+		}
+
+		return $canvas;
+    }
 
 	public function addDataSet(IDataSet $dataSet): Graph
 	{
@@ -28,9 +98,7 @@ class Graph
 		return $this;
 	}
 
-	/**
-	 * @param  \Marzzelo\Graph\IDataSet[]  $dataSets
-	 */
+
 	public function addDataSets(array $dataSets): self
 	{
 		$this->series = array_merge($this->series, $dataSets);

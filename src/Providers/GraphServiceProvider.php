@@ -22,25 +22,25 @@ class GraphServiceProvider extends ServiceProvider
 	{
 		// register the graph service
 		$this->app->bind('graph', function ($app, $params) {
-			return new Graph($params["axis"]);
+			return new Graph(...$params);
 		});
 
-		$this->app->bind('frame', function () {
-			return new Frame(800, 600, '#FFD', '#BBB');
+		$this->app->bind('frame', function ($app, $params) {
+			return new Frame(...$params);
 		});
 
-		$this->app->bind('dataSet', function () {
-			return new DataSet([],  0, '#0AA');
+		$this->app->bind('dataSet', function ($app, $params) {
+			return new DataSet(...$params);
 		});
 
-		$this->app->bind('autoAxis', function () {
-			$frame = $this->app->make('frame'); // instanciates a Frame object with default values
-			return new AutoAxis([], $frame);
+		$this->app->bind('autoAxis', function ($app, $params) {
+			// $frame = $this->app->make('frame'); // instanciates a Frame object with default values
+			return new AutoAxis(...$params);
 		});
 
-		$this->app->bind('basicAxis', function () {
-			$frame = $this->app->make('frame'); // instanciates a Frame object with default values
-			return new BasicAxis(-10, 10, -10, 10, $frame);
+		$this->app->bind('basicAxis', function ($app, $params) {
+			// $frame = $this->app->make('frame'); // instanciates a Frame object with default values
+			return new BasicAxis(...$params);
 		});
 	}
 
