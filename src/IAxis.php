@@ -23,9 +23,9 @@ interface IAxis
 
 	public function draw(): Image;
 
-	public function setGrid(float $stepx, float $stepy): self;
+	public function setGrid(?float $stepx, ?float $stepy): self;
 
-	public function addTitle(string $title): self;
+	public function setTitle(?string $title): self;
 
-	public function addLabels(array $labels): self;
+	public function setLabels(?array $labels): self;
 }

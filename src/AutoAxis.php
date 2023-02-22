@@ -14,10 +14,10 @@ class AutoAxis extends BasicAxis implements IAxis
 	 * @param  \Marzzelo\Graph\Frame  $frame   Frame object
 	 * @param  int                    $margin  Margin from canvas border to Series curves
 	 */
-	public function __construct(array $data, Frame &$frame, $margin = 20)
+	public function __construct(array $data, Frame &$frame, $options = [])
 	{
 		[$xm, $xM, $ym, $yM] = $this->endpoints($data);
-		parent::__construct($xm, $xM, $ym, $yM, $frame, $margin);
+		parent::__construct($xm, $xM, $ym, $yM, $frame, $options);
 	}
 
 	// public function make(float $xm, float $xM, float $ym, float $yM, Frame &$frame, $margin = 20): AutoAxis

@@ -17,13 +17,12 @@ class Frame implements IFrame
 	private string $frame_color;
 
 
-	public function __construct(int $width_px = 800, int $height_px = 600, string $background_color = '#FFD',
-		string $frame_color = '#BBB')
+	public function __construct(array $options)
 	{
-		$this->width_px = $width_px;
-		$this->height_px = $height_px;
-		$this->background_color = $background_color;
-		$this->frame_color = $frame_color;
+		$this->width_px = $options['width_px'];
+		$this->height_px = $options['height_px'];
+		$this->background_color = $options['background_color'];
+		$this->frame_color = $options['frame_color'];
 	}
 
 	public function getCanvas(): Image

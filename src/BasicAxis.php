@@ -28,17 +28,21 @@ class BasicAxis implements IAxis
 
 	protected ?float $stepx = null, $stepy = null;
 
+	protected array $options = [];
+
 
 	/**
-	 * @param  float                  $xm      X min
-	 * @param  float                  $xM      X max
-	 * @param  float                  $ym      Y min
-	 * @param  float                  $yM      Y max
-	 * @param  \Marzzelo\Graph\Frame  $frame   Frame object
-	 * @param  int                    $margin  from canvas border to Series curves
+	 * @param  float                  $xm     X min
+	 * @param  float                  $xM     X max
+	 * @param  float                  $ym     Y min
+	 * @param  float                  $yM     Y max
+	 * @param  \Marzzelo\Graph\Frame  $frame  Frame object
+	 * @param  array                  $options
 	 */
-	public function __construct(float $xm, float $xM, float $ym, float $yM, Frame &$frame,	int $margin =	20)
+	public function __construct(float $xm, float $xM, float $ym, float $yM, Frame &$frame, array $options = [])
 	{
+		$this->options = $options;
+
 		if (($xm == $xM) || ($ym == $yM)) {
 			throw new InvalidArgumentException('WIDTH OR HEIGHT CAN NOT BE ZERO');
 		}
@@ -46,10 +50,11 @@ class BasicAxis implements IAxis
 		$dx = abs($xM - $xm);
 		$dy = abs($yM - $ym);
 
-		if (is_array($margin)) {
-			[$xmargin, $ymargin] = $margin;
-		} else {
-			$xmargin = $ymargin = $margin;
+		if (is_array($options["margin"] ?? null)) {
+			[$xmargin, $ymargin] = $options["margin"];
+		}
+		else {
+			$xmargin = $ymargin = $options["margin"] ?? 20;
 		}
 
 		$this->_xmin = $xm - $xmargin / 100 * $dx;
@@ -60,23 +65,23 @@ class BasicAxis implements IAxis
 		$this->canvas = $frame->getCanvas();
 	}
 
-	public function addLabels(array $labels): self
+	public function setLabels(array $labels = null): self
 	{
-		$this->xlabel = $labels[0];
-		$this->ylabel = $labels[1];
+		$this->xlabel = $labels[0] ?? '';  // ToDo: get from config(...)
+		$this->ylabel = $labels[1] ?? '';
 		return $this;
 	}
 
-	public function addTitle(string $title): IAxis
+	public function setTitle(?string $title = null): IAxis
 	{
-		$this->title = $title;
+		$this->title = $title ?? '';  // ToDo: get from config(...)
 		return $this;
 	}
 
-	public function setGrid(?float $stepx, ?float $stepy): self
+	public function setGrid(?float $stepx = null, ?float $stepy = null): self
 	{
-		$this->stepx ??= $stepx;
-		$this->stepy ??= $stepy;
+		$this->stepx = $stepx;
+		$this->stepy = $stepy;
 		return $this;
 	}
 
@@ -97,7 +102,7 @@ class BasicAxis implements IAxis
 		for ($i = $nmin; $i < $nsteps; $i++) {
 			[$xn, $yn] = $this->XY($i * $sx, 0);
 			$canvas->line($xn, 0, $xn, $H, function ($draw) {
-				$draw->color = '#DDD';
+				$draw->color = $this->options["gridColor"] ?? '#DDD';
 			});
 			$format = (abs($i * $sx) < 10)
 				? '%.2f'
@@ -114,7 +119,7 @@ class BasicAxis implements IAxis
 		for ($i = $nmin; $i < $nsteps; $i++) {
 			[$xn, $yn] = $this->XY(0, $i * $sy);
 			$canvas->line(0, $yn, $W, $yn, function ($draw) {
-				$draw->color = '#DDD';
+				$draw->color = $this->options["gridColor"] ?? '#DDD';
 			});
 			$format = (abs($i * $sy) < 10)
 				? '%.2f'
@@ -124,21 +129,21 @@ class BasicAxis implements IAxis
 
 		// XY-AXIS
 		$canvas->line($CX, 0, $CX, $H, function ($draw) {
-			$draw->color('#555');
+			$draw->color($this->options['axis-color'] ?? '#555');
 		})
 		       ->line(0, $CY, $W, $CY, function ($draw) {
-			       $draw->color('#555');
+			       $draw->color($this->options['axis-color'] ?? '#555');
 		       });
 
 		// TITLE
 		if ($this->title) {
-			$canvas->rectangle(0, 0, $W - 1, 18, function ($draw) {
-				$draw->background('rgba(255, 255, 255, 1.0)');  // opacity could be 0.8
-				$draw->border(1, 'rgba(128, 128, 128, 1.0)');
+			$canvas->rectangle(0, 0, $W - 1, 18, function ($draw)  {
+				$draw->background($this->options['background-color']);  // opacity could be 0.8
+				$draw->border(1, $this->options['border-color']);
 			});
 			$canvas->text($this->title, $W / 2, 5, function ($font) {
 				$font->file(5);
-				$font->color('#000');
+				$font->color($this->options['title-color'] ?? '#000');
 				$font->align('center');
 				$font->valign('top');
 			});
@@ -153,7 +158,7 @@ class BasicAxis implements IAxis
 				(int) Graph::confineTo($this->XY(0, 0)[1] + 3, 0,  $this->canvas->height() - 20),
 				function ($font) {
 						$font->file(2);
-						$font->color('#000');
+						$font->color($this->options['labels-color'] ?? '#000');
 						$font->align('right');
 						$font->valign('top');
 				});
@@ -167,7 +172,7 @@ class BasicAxis implements IAxis
 				24,
 				function ($font) {
 					$font->file(2);
-					$font->color('#000');
+					$font->color($this->options['labels-color'] ?? '#000');
 					$font->align('left');
 					$font->valign('top');
 				});

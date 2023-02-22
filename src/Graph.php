@@ -8,29 +8,38 @@ use Intervention\Image\Image;
 class Graph
 {
 	private array $options = [
-		'frame.width_px'         => 640,
-		'frame.height_px'        => 400,
-		'frame.background_color' => '#FFE',
-		'frame.frame_color'      => '#bbb',
+		'frame' => [
+			'width_px'         => 640,
+			'height_px'        => 400,
+			'background_color' => '#FFE',
+			'frame_color'      => '#bbb',
+		],
 
-		'axis.grid'   => [],
-		'axis.labels' => [],
-		'axis.margin' => 20,
-		'axis.title'  => '',
+		'axis' => [
+			'grid-size-xy'   => [null, null],
+			'labels' => [null, null],
+			'margin' => 20,  // can be array [x, y] or int
+			'title'  => '',
+			'title-color' => '#000',
+			'axis-color'  => '#555', // color of axis lines
+			'grid-color' => '#ddd',
+			'background-color' => '#fff',
+			'labels-color' => '#555',
+		],
 
-		'dataset.marker-radius' => [],
-		'dataset.marker-color'  => [],
+		'dataset' => [
+			'line-color' => '#00A',
+			'marker-radius' => 0,
+			'marker-color'  => '#00A',
+		],
 
 		'csv.separator' => ',',
 		'csv.skip'      => 0,
-		'csv.path'      => '',
 	];
 
 	private ?IFrame $frame = null;
 
 	private ?IAxis $axis = null;
-
-	// private array $data = [];  // raw data
 
 	/**
 	 * @var \Marzzelo\Graph\IDataSet[]
@@ -73,28 +82,23 @@ class Graph
 		$options = $this->addOptions($options);
 
 		$this->frame = new Frame(
-			$options['frame.width_px'] ?? 640, // ToDo: use config('graph.frame.width_px')
-			$options['frame.height_px'] ?? 400,
-			$options['frame.background_color'] ?? '#FFE',
-			$options['frame.frame_color'] ?? '#bbb'
+			$options['frame']
 		);
 
 		foreach ($data as $data_n) {
 			$this->series[] = new DataSet(
 				$data_n,
-				$options['dataset.marker-radius'] ?? 0,
-				$options['dataset.marker-color'] ?? '#0AA');
+				$options['dataset']);
 		}
 
 		$this->axis = (new AutoAxis(
 			$this->series,
 			$this->frame,
-			$options['axis.margin'] ?? 20
+			$options['axis']
 		))
-			->addLabels($options['axis.labels'] ?? ['t', 'x, y, z'])
-			->addTitle($options['axis.title'] ?? '')
-			->setGrid(...$options['axis.grid'])
-		;
+			->setLabels($options['axis']['labels'])
+			->setTitle($options['axis']['title'])
+			->setGrid(...$options['axis']['grid-size-xy'] ?? [null, null]);
 
 		$canvas = $this->axis->draw();  // ejes, grilla, labels, title
 
@@ -128,7 +132,7 @@ class Graph
 	public function render(): Image
 	{
 		if ($this->headers) {
-			$this->axis->addLabels($this->headers);
+			$this->axis->setLabels($this->headers);
 		}
 		$canvas = $this->axis->draw();  // ejes, grilla, labels, title
 
@@ -147,15 +151,14 @@ class Graph
 	}
 
 	// Factory a Frame object
-	public static function getFrame(int $width_px = 800, int $height_px = 600, string $background_color = '#FFD',
-		string $frame_color = '#BBB'): Frame
+	public static function getFrame(array $options): Frame
 	{
-		return new Frame($width_px, $height_px, $background_color, $frame_color);
+		return new Frame($options);
 	}
 
-	public static function getDataSet(array $data, int $radius = 0, string $color = '#0AA'): DataSet
+	public static function getDataSet(array $data, array $options): DataSet
 	{
-		return new DataSet($data, $radius, $color);
+		return new DataSet($data, $options);
 	}
 
 	public static function getBasicAxis(float $xm, float $xM, float $ym, float $yM, Frame &$frame, $margin = 20):

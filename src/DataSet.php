@@ -10,21 +10,33 @@ class DataSet implements IDataSet
 {
 	private array $data;
 
-	private int $radius;
+	/**
+	 * @var mixed|string
+	 */
+	private mixed $lineColor;
 
-	private string $color;
+	/**
+	 * @var mixed|string
+	 */
+	private mixed $markerColor;
 
-	public function __construct(array $data = [], int $radius = 0, string $color = '#0AA')
+	/**
+	 * @var int|mixed
+	 */
+	private mixed $markerRadius;
+
+	public function __construct(array $data = [], array $options = [])
 	{
 		$this->data = $data;
-		$this->radius = $radius;
-		$this->color = $color;
+		$this->markerRadius = $options['marker-radius'] ?? 0;
+		$this->markerColor = $options['marker-color'] ?? '#00A';
+		$this->lineColor = $options['line-color'] ?? '#00A';
 	}
 
 	public function setMarker(int $radius = 0, string $color = '#00A')
 	{
-		$this->radius = $radius;
-		$this->color = $color;
+		$this->markerRadius = $radius;
+		$this->markerColor = $color;
 	}
 
 	public function xBounds(): array
@@ -65,11 +77,11 @@ class DataSet implements IDataSet
 			[$X, $Y] = $axis->XY($xy[0], $xy[1]);
 
 			$canvas->line($X0, $Y0, $X, $Y, function ($draw) {
-				$draw->color($this->color);
+				$draw->color($this->lineColor);
 			});
-			if ($this->radius) {
-				$canvas->circle($this->radius, $X, $Y, function ($draw) {
-					$draw->background($this->color);
+			if ($this->markerRadius) {
+				$canvas->circle($this->markerRadius, $X, $Y, function ($draw) {
+					$draw->background($this->markerColor);
 				});
 			}
 			[$X0, $Y0] = [$X, $Y];

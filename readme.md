@@ -101,7 +101,7 @@ $frame = new Frame(640, 400);  // create the frame
 $axis = (new AutoAxis($datasets, $frame ))  // create the axis
     ->addLabels('time[s]', 'current[A], voltage[V]')
     ->setGrid(200, 100);
-    ->addTitle('Current and voltage vs time');
+    ->setTitle('Current and voltage vs time');
     
 (new Graph($axis))  
 	->addDataSets($datasets) // add the datasets to the graph
@@ -145,7 +145,7 @@ The same applies to the Axis and Graph facades:
 $axis = Graph::AutoAxis([$dataset1, $dataset2], $frame, [5, 10]) // Create the axis and set the grid spacing
 	->addLabels(['time[s]', 'current[A], voltage[V]']) // Add labels to the axis
 	->setGrid($gridx, $gridy) // Set the grid spacing
-	->addTitle($title); // Add a title to the graph
+	->setTitle($title); // Add a title to the graph
 ```
 
 Finally, to create a Graph, use the `Graph` facade:
