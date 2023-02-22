@@ -7,82 +7,95 @@ use Intervention\Image\Image;
 
 class Graph
 {
-    private array $options = [
-        'frame.width_px' => 640,
-        'frame.height_px' => 400,
-        'frame.background_color' => '#FFE',
-        'frame.frame_color' => '#bbb',
+	private array $options = [
+		'frame.width_px'         => 640,
+		'frame.height_px'        => 400,
+		'frame.background_color' => '#FFE',
+		'frame.frame_color'      => '#bbb',
 
-        'axis.grid' => [],
-        'axis.labels' => [],
-        'axis.margin' => 20,
-        'axis.title' => '',
+		'axis.grid'   => [],
+		'axis.labels' => [],
+		'axis.margin' => 20,
+		'axis.title'  => '',
 
-        'dataset.marker-radius' => [],
-        'dataset.marker-color' => [],
+		'dataset.marker-radius' => [],
+		'dataset.marker-color'  => [],
 
-        'csv.separator' => ',',
-        'csv.skip' => 0,
-        'csv.path' => '',
-    ];
+		'csv.separator' => ',',
+		'csv.skip'      => 0,
+		'csv.path'      => '',
+	];
 
-    private ?IFrame $frame = null;
+	private ?IFrame $frame = null;
 
 	private ?IAxis $axis = null;
 
-    private array $data = [];
+	// private array $data = [];  // raw data
 
 	/**
 	 * @var \Marzzelo\Graph\IDataSet[]
 	 */
-	private array $series = [];
+	private array $series = [];  // DataSet objects
 
 	private array $headers = [];
 
 
-    /*******************************************************************
-     * Graph constructor.
-     * @param IAxis|null $axis
-     *******************************************************************/
+	/**
+	 * Graph constructor.
+	 *
+	 * @param  IAxis|null  $axis
+	 */
 	public function __construct(?IAxis $axis = null)
 	{
 		if ($axis)
-            $this->make($axis);
+			$this->make($axis);
 	}
 
-    public function make(IAxis $axis) {
-        $this->axis = $axis;
-        return $this;
-    }
+	public function make(IAxis $axis): Graph
+	{
+		$this->axis = $axis;
+		return $this;
+	}
 
-    public function addOptions(array $options) {
-        // update $this->options with new $options:
-        $this->options = array_merge($this->options, $options);
-    }
+	public function addOptions(array $options): array
+	{
+		// update $this->options with new $options:
+		$this->options = array_merge($this->options, $options);
+		return $this->options;
+	}
 
-    /**
-     * @param array $data 2D array of data in the form [[t, x, y, z], [t, x, y, z], ...]
-     * @param array $options array of options
-     */
-    public function fromArray(array $data, array $options = []) {
-        
-        $this->addOptions($options);
+	/**
+	 * @param  array  $data     2D array of data in the form [[t, x, y, z], [t, x, y, z], ...]
+	 * @param  array  $options  array of options
+	 */
+	public function fromArray(array $data, array $options = []): Image
+	{
+		$options = $this->addOptions($options);
 
-        $this->frame = new Frame(
-            $options['frame.width_px'] ?? 640, // ToDo: use config('graph.frame.width_px')
-            $options['frame.height_px'] ?? 400,
-            $options['frame.background_color'] ?? '#FFE', 
-            $options['frame.frame_color'] ?? '#bbb'
-        );
+		$this->frame = new Frame(
+			$options['frame.width_px'] ?? 640, // ToDo: use config('graph.frame.width_px')
+			$options['frame.height_px'] ?? 400,
+			$options['frame.background_color'] ?? '#FFE',
+			$options['frame.frame_color'] ?? '#bbb'
+		);
 
-        $this->axis = new AutoAxis(
-            $data,
-            $this->frame,
-            $options['axis.margin'] ?? 20            
-        );
-			
-        $this->axis->addLabels($this->headers);
-		
+		foreach ($data as $data_n) {
+			$this->series[] = new DataSet(
+				$data_n,
+				$options['dataset.marker-radius'] ?? 0,
+				$options['dataset.marker-color'] ?? '#0AA');
+		}
+
+		$this->axis = (new AutoAxis(
+			$this->series,
+			$this->frame,
+			$options['axis.margin'] ?? 20
+		))
+			->addLabels($options['axis.labels'] ?? ['t', 'x, y, z'])
+			->addTitle($options['axis.title'] ?? '')
+			->setGrid(...$options['axis.grid'])
+		;
+
 		$canvas = $this->axis->draw();  // ejes, grilla, labels, title
 
 		foreach ($this->series as $dataSet) {
@@ -90,7 +103,8 @@ class Graph
 		}
 
 		return $canvas;
-    }
+
+	}
 
 	public function addDataSet(IDataSet $dataSet): Graph
 	{

@@ -2,7 +2,6 @@
 
 namespace Marzzelo\Graph\Providers;
 
-use Closure;
 use Marzzelo\Graph\Frame;
 use Marzzelo\Graph\Graph;
 use Marzzelo\Graph\DataSet;
@@ -18,7 +17,7 @@ class GraphServiceProvider extends ServiceProvider
 	 *
 	 * @return void
 	 */
-	public function register()
+	public function register(): void
 	{
 		// register the graph service
 		$this->app->bind('graph', function ($app, $params) {
@@ -44,7 +43,8 @@ class GraphServiceProvider extends ServiceProvider
 		});
 	}
 
-	public function boot() {
+	public function boot()
+	{
 		// boot() se ejecuta al finalizar el registro de todos los Service Providers.
 	}
 }

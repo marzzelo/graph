@@ -4,12 +4,16 @@ declare(strict_types=1);
 namespace Marzzelo\Graph;
 
 use Intervention\Image\Image;
+use InvalidArgumentException;
+use Marzzelo\Graph\Traits\Utils;
 
 /**
  *
  */
 class BasicAxis implements IAxis
 {
+	use Utils;
+
 	private float $_xmin;
 
 	private float $_xmax;
@@ -22,21 +26,21 @@ class BasicAxis implements IAxis
 
 	protected string $title = '', $xlabel = '', $ylabel = '';
 
-	protected ?float $stepx = 0, $stepy = 0;
+	protected ?float $stepx = null, $stepy = null;
 
 
 	/**
-	 * @param  float                       $xm     X min
-	 * @param  float                       $xM     X max
-	 * @param  float                       $ym     Y min
-	 * @param  float                       $yM     Y max
-	 * @param  \Marzzelo\Graph\Frame|null  $frame  Frame object
-	 * @param  integer|array               $margin  from canvas border to Series curves
+	 * @param  float                  $xm      X min
+	 * @param  float                  $xM      X max
+	 * @param  float                  $ym      Y min
+	 * @param  float                  $yM      Y max
+	 * @param  \Marzzelo\Graph\Frame  $frame   Frame object
+	 * @param  int                    $margin  from canvas border to Series curves
 	 */
-	public function __construct(float $xm, float $xM, float $ym, float $yM, Frame &$frame,	$margin =	20)
+	public function __construct(float $xm, float $xM, float $ym, float $yM, Frame &$frame,	int $margin =	20)
 	{
 		if (($xm == $xM) || ($ym == $yM)) {
-			throw new \InvalidArgumentException('WIDTH OR HEIGHT CAN NOT BE ZERO');
+			throw new InvalidArgumentException('WIDTH OR HEIGHT CAN NOT BE ZERO');
 		}
 
 		$dx = abs($xM - $xm);
@@ -71,8 +75,8 @@ class BasicAxis implements IAxis
 
 	public function setGrid(?float $stepx, ?float $stepy): self
 	{
-		$this->stepx = $stepx;
-		$this->stepy = $stepy;
+		$this->stepx ??= $stepx;
+		$this->stepy ??= $stepy;
 		return $this;
 	}
 
@@ -85,7 +89,7 @@ class BasicAxis implements IAxis
 		[$CX, $CY] = $this->XY(0, 0);
 
 		$sx = $this->stepx
-			?: ($this->_xmax - $this->_xmin) / 5;
+			?: $this->roundToFirstDigit(($this->_xmax - $this->_xmin) / 5);
 		$nmin = floor($this->_xmin / $sx);
 		$nsteps = ($this->_xmax - $this->_xmin) / $sx;
 
@@ -102,7 +106,7 @@ class BasicAxis implements IAxis
 		}
 
 		$sy = $this->stepy
-			?: ($this->_ymax - $this->_ymin) / 5;
+			?: $this->roundToFirstDigit(($this->_ymax - $this->_ymin) / 5);
 		$nmin = floor($this->_ymin / $sy);
 		$nsteps = ($this->_ymax - $this->_ymin) / $sy;
 
