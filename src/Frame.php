@@ -20,18 +20,10 @@ class Frame implements IFrame
 	public function __construct(int $width_px = 800, int $height_px = 600, string $background_color = '#FFD',
 		string $frame_color = '#BBB')
 	{
-		$this->make($width_px, $height_px, $background_color, $frame_color);
-	}
-
-	public function make(int $width_px, int $height_px, string $background_color = '#FFd', string $frame_color =
-	'#BBB'): self
-	{
 		$this->width_px = $width_px;
 		$this->height_px = $height_px;
 		$this->background_color = $background_color;
 		$this->frame_color = $frame_color;
-
-		return $this;
 	}
 
 	public function getCanvas(): Image

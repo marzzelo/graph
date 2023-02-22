@@ -35,10 +35,6 @@ class BasicAxis implements IAxis
 	 */
 	public function __construct(float $xm, float $xM, float $ym, float $yM, Frame &$frame,	$margin =	20)
 	{
-		$this->make($xm, $xM, $ym, $yM, $frame, $margin);
-	}
-
-	public function make(float $xm, float $xM, float $ym, float $yM, Frame &$frame, $margin = 20): self {
 		if (($xm == $xM) || ($ym == $yM)) {
 			throw new \InvalidArgumentException('WIDTH OR HEIGHT CAN NOT BE ZERO');
 		}
@@ -58,7 +54,6 @@ class BasicAxis implements IAxis
 		$this->_ymax = $yM + $ymargin / 100 * $dy;
 
 		$this->canvas = $frame->getCanvas();
-		return $this;
 	}
 
 	public function addLabels(array $labels): self

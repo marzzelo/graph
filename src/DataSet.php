@@ -16,16 +16,9 @@ class DataSet implements IDataSet
 
 	public function __construct(array $data = [], int $radius = 0, string $color = '#0AA')
 	{
-		$this->make($data, $radius, $color);
-	}
-
-	public function make(array $data, int $radius = 0, string $color = '#0AA'): self
-	{
 		$this->data = $data;
 		$this->radius = $radius;
 		$this->color = $color;
-
-		return $this;
 	}
 
 	public function setMarker(int $radius = 0, string $color = '#00A')

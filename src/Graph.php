@@ -17,17 +17,9 @@ class Graph
 	private array $headers = [];
 
 
-	public function __construct(?IAxis $axis = null)
-	{
-		if ($axis) {
-			$this->make($axis);
-		}
-	}
-
-	public function make(IAxis $axis): self
+	public function __construct(IAxis $axis)
 	{
 		$this->axis = $axis;
-		return $this;
 	}
 
 	public function addDataSet(IDataSet $dataSet): Graph

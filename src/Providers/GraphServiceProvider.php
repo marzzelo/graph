@@ -21,8 +21,8 @@ class GraphServiceProvider extends ServiceProvider
 	public function register()
 	{
 		// register the graph service
-		$this->app->bind('graph', function () {
-			return new Graph();
+		$this->app->bind('graph', function ($app, $params) {
+			return new Graph($params["axis"]);
 		});
 
 		$this->app->bind('frame', function () {

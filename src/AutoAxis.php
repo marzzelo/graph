@@ -20,11 +20,11 @@ class AutoAxis extends BasicAxis implements IAxis
 		parent::__construct($xm, $xM, $ym, $yM, $frame, $margin);
 	}
 
-	public function make(float $xm, float $xM, float $ym, float $yM, Frame &$frame, $margin = 20): AutoAxis
-	{
-		parent::make($xm, $xM, $ym, $yM, $frame, $margin);
-		return $this;
-	}
+	// public function make(float $xm, float $xM, float $ym, float $yM, Frame &$frame, $margin = 20): AutoAxis
+	// {
+	// 	parent::make($xm, $xM, $ym, $yM, $frame, $margin);
+	// 	return $this;
+	// }
 
 
 	/**
