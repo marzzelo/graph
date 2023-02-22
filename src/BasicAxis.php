@@ -102,7 +102,7 @@ class BasicAxis implements IAxis
 		for ($i = $nmin; $i < $nsteps; $i++) {
 			[$xn, $yn] = $this->XY($i * $sx, 0);
 			$canvas->line($xn, 0, $xn, $H, function ($draw) {
-				$draw->color = $this->options["gridColor"] ?? '#DDD';
+				$draw->color = $this->options["grid-color"] ?? '#DDD';
 			});
 			$format = (abs($i * $sx) < 10)
 				? '%.2f'
@@ -119,7 +119,7 @@ class BasicAxis implements IAxis
 		for ($i = $nmin; $i < $nsteps; $i++) {
 			[$xn, $yn] = $this->XY(0, $i * $sy);
 			$canvas->line(0, $yn, $W, $yn, function ($draw) {
-				$draw->color = $this->options["gridColor"] ?? '#DDD';
+				$draw->color = $this->options["grid-color"] ?? '#DDD';
 			});
 			$format = (abs($i * $sy) < 10)
 				? '%.2f'
@@ -138,8 +138,8 @@ class BasicAxis implements IAxis
 		// TITLE
 		if ($this->title) {
 			$canvas->rectangle(0, 0, $W - 1, 18, function ($draw)  {
-				$draw->background($this->options['background-color']);  // opacity could be 0.8
-				$draw->border(1, $this->options['border-color']);
+				$draw->background($this->options['title-background-color'] ?? '#FFF');  // opacity could be 0.8
+				$draw->border(1, $this->options['axis-color'] ?? '#555');
 			});
 			$canvas->text($this->title, $W / 2, 5, function ($font) {
 				$font->file(5);

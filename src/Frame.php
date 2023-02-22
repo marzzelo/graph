@@ -19,10 +19,10 @@ class Frame implements IFrame
 
 	public function __construct(array $options)
 	{
-		$this->width_px = $options['width_px'];
-		$this->height_px = $options['height_px'];
-		$this->background_color = $options['background_color'];
-		$this->frame_color = $options['frame_color'];
+		$this->width_px = $options['width-px'] ?? 640;
+		$this->height_px = $options['height-px'] ?? 400;
+		$this->background_color = $options['background-color'] ?? '#FFE';
+		$this->frame_color = $options['frame-color'] ?? '#bbb';
 	}
 
 	public function getCanvas(): Image
