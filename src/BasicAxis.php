@@ -5,6 +5,9 @@ namespace Marzzelo\Graph;
 
 use Intervention\Image\Image;
 
+/**
+ *
+ */
 class BasicAxis implements IAxis
 {
 	private float $_xmin;
@@ -19,15 +22,23 @@ class BasicAxis implements IAxis
 
 	protected string $title = '', $xlabel = '', $ylabel = '';
 
-	protected float $stepx = 0, $stepy = 0;
+	protected ?float $stepx = 0, $stepy = 0;
+
 
 	/**
-	 * basicAxis constructor.
-	 * @param float $margin Margin percentage
+	 * @param  float                       $xm     X min
+	 * @param  float                       $xM     X max
+	 * @param  float                       $ym     Y min
+	 * @param  float                       $yM     Y max
+	 * @param  \Marzzelo\Graph\Frame|null  $frame  Frame object
+	 * @param  integer|array               $margin  from canvas border to Series curves
 	 */
-	// public function __construct(XYPoint $ul, XYPoint $lr, float $margin = 20, string $title = '')
-	public function __construct(float $xm, float $xM, float $ym, float $yM, Frame &$frame, float $margin = 20)
+	public function __construct(float $xm, float $xM, float $ym, float $yM, Frame &$frame,	$margin =	20)
 	{
+		$this->make($xm, $xM, $ym, $yM, $frame, $margin);
+	}
+
+	public function make(float $xm, float $xM, float $ym, float $yM, Frame &$frame, $margin = 20): self {
 		if (($xm == $xM) || ($ym == $yM)) {
 			throw new \InvalidArgumentException('WIDTH OR HEIGHT CAN NOT BE ZERO');
 		}
@@ -35,12 +46,19 @@ class BasicAxis implements IAxis
 		$dx = abs($xM - $xm);
 		$dy = abs($yM - $ym);
 
-		$this->_xmin = $xm - $margin / 100 * $dx;
-		$this->_xmax = $xM + $margin / 100 * $dx;
-		$this->_ymin = $ym - $margin / 100 * $dy;
-		$this->_ymax = $yM + $margin / 100 * $dy;
+		if (is_array($margin)) {
+			[$xmargin, $ymargin] = $margin;
+		} else {
+			$xmargin = $ymargin = $margin;
+		}
+
+		$this->_xmin = $xm - $xmargin / 100 * $dx;
+		$this->_xmax = $xM + $xmargin / 100 * $dx;
+		$this->_ymin = $ym - $ymargin / 100 * $dy;
+		$this->_ymax = $yM + $ymargin / 100 * $dy;
 
 		$this->canvas = $frame->getCanvas();
+		return $this;
 	}
 
 	public function addLabels(array $labels): self
@@ -56,7 +74,7 @@ class BasicAxis implements IAxis
 		return $this;
 	}
 
-	public function setGrid(float $stepx, float $stepy): self
+	public function setGrid(?float $stepx, ?float $stepy): self
 	{
 		$this->stepx = $stepx;
 		$this->stepy = $stepy;
@@ -116,8 +134,8 @@ class BasicAxis implements IAxis
 		// TITLE
 		if ($this->title) {
 			$canvas->rectangle(0, 0, $W - 1, 18, function ($draw) {
-				$draw->background('rgba(255, 255, 255, 0.8)');
-				$draw->border(1, 'rgba(128, 128, 128, 0.8)');
+				$draw->background('rgba(255, 255, 255, 1.0)');  // opacity could be 0.8
+				$draw->border(1, 'rgba(128, 128, 128, 1.0)');
 			});
 			$canvas->text($this->title, $W / 2, 5, function ($font) {
 				$font->file(5);
@@ -146,7 +164,7 @@ class BasicAxis implements IAxis
 		if ($this->ylabel) {
 			$canvas->text(
 				$this->ylabel,
-				(int)Graph::confineTo($this->XY(0, 0)[0] + 3, 3, $this->canvas->width() - 50),
+				(int)Graph::confineTo($this->XY(0, 0)[0] + 30, 30, $this->canvas->width() - 50),
 				24,
 				function ($font) {
 					$font->file(2);

@@ -14,7 +14,8 @@
     "intervention/image": "^2.5"
   },
   "require-dev": {
-    "phpunit/phpunit": "^9.5"
+    "phpunit/phpunit": "^9.5",
+    "orchestra/testbench": "^8.0"
   },
   "autoload": {
     "psr-4": {
@@ -24,6 +25,20 @@
   "autoload-dev": {
     "psr-4": {
       "Marzzelo\\Tests\\": "tests/"
+    }
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Marzzelo\\Graph\\Providers\\GraphServiceProvider"
+      ],
+      "aliases": {
+        "Frame": "Marzzelo\\Graph\\Facades\\Frame",
+        "Graph": "Marzzelo\\Graph\\Facades\\Graph",
+        "DataSet": "Marzzelo\\Graph\\Facades\\DataSet",
+        "BasicAxis": "Marzzelo\\Graph\\Facades\\BasicAxis",
+        "AutoAxis": "Marzzelo\\Graph\\Facades\\AutoAxis"
+      }
     }
   }
 }

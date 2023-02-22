@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Marzzelo\Graph;
 
@@ -6,7 +7,7 @@ use Intervention\Image\Image;
 
 class Graph
 {
-	private IAxis $axis;
+	private ?IAxis $axis = null;
 
 	/**
 	 * @var \Marzzelo\Graph\IDataSet[]
@@ -16,18 +17,27 @@ class Graph
 	private array $headers = [];
 
 
-	public function __construct(IAxis $axis)
+	public function __construct(?IAxis $axis = null)
 	{
-		$this->axis = $axis;
+		if ($axis) {
+			$this->make($axis);
+		}
 	}
 
-	public function addDataSet(IDataSet $dataSet)
+	public function make(IAxis $axis): self
+	{
+		$this->axis = $axis;
+		return $this;
+	}
+
+	public function addDataSet(IDataSet $dataSet): Graph
 	{
 		$this->series[] = $dataSet;
+		return $this;
 	}
 
 	/**
-	 * @param \Marzzelo\Graph\IDataSet[] $dataSets
+	 * @param  \Marzzelo\Graph\IDataSet[]  $dataSets
 	 */
 	public function addDataSets(array $dataSets): self
 	{
@@ -35,9 +45,15 @@ class Graph
 		return $this;
 	}
 
+	public function setDataSets(array $dataSets): self
+	{
+		$this->series = $dataSets;
+		return $this;
+	}
+
 	public function render(): Image
 	{
-		if($this->headers) {
+		if ($this->headers) {
 			$this->axis->addLabels($this->headers);
 		}
 		$canvas = $this->axis->draw();  // ejes, grilla, labels, title
@@ -51,9 +67,38 @@ class Graph
 
 	public function render64(string $format = 'png'): string
 	{
-		$img64 = base64_encode((string) $this->render()->encode($format));
+		$img64 = base64_encode((string)$this->render()->encode($format));
 
 		return "data:image/$format;base64,$img64";
+	}
+
+	// Factory a Frame object
+	public static function getFrame(int $width_px = 800, int $height_px = 600, string $background_color = '#FFD',
+		string $frame_color = '#BBB'): Frame
+	{
+		return new Frame($width_px, $height_px, $background_color, $frame_color);
+	}
+
+	public static function getDataSet(array $data, int $radius = 0, string $color = '#0AA'): DataSet
+	{
+		return new DataSet($data, $radius, $color);
+	}
+
+	public static function getBasicAxis(float $xm, float $xM, float $ym, float $yM, Frame &$frame, $margin = 20):
+	BasicAxis
+	{
+		return new BasicAxis($xm, $xM, $ym, $yM, $frame, $margin);
+	}
+
+	public static function getAutoAxis(array $dataSets, Frame &$frame, $margin = 20): AutoAxis
+	{
+		return new AutoAxis($dataSets, $frame, $margin);
+	}
+
+	public static function getCsvFileReader(string $csvFile, string $delimiter = "\t", bool $hasHeaders = true):
+	CsvFileReader
+	{
+		return new CsvFileReader($csvFile, $delimiter, $hasHeaders);
 	}
 
 	public static function confineTo(float $x, float $min, float $max): float
