@@ -33,12 +33,6 @@ class DataSet implements IDataSet
 		$this->lineColor = $options['line-color'] ?? '#00A';
 	}
 
-	public function setMarker(int $radius = 0, string $color = '#00A')
-	{
-		$this->markerRadius = $radius;
-		$this->markerColor = $color;
-	}
-
 	public function xBounds(): array
 	{
 		$xdata = array_column($this->data, 0);

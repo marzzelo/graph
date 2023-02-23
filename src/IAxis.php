@@ -22,10 +22,4 @@ interface IAxis
 	public function XY(float $x, float $y): array;
 
 	public function draw(): Image;
-
-	public function setGrid(?float $stepx, ?float $stepy): self;
-
-	public function setTitle(?string $title): self;
-
-	public function setLabels(?array $labels): self;
 }

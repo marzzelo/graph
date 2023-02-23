@@ -95,10 +95,7 @@ class Graph
 			$this->series,
 			$this->frame,
 			$options['axis']
-		))
-			->setLabels($options['axis']['labels'])
-			->setTitle($options['axis']['title'])
-			->setGrid(...$options['axis']['grid-size-xy'] ?? [null, null]);
+		));
 
 		$canvas = $this->axis->draw();  // ejes, grilla, labels, title
 
