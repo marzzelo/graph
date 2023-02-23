@@ -27,6 +27,9 @@ class DataSet implements IDataSet
 
 	public function __construct(array $data = [], array $options = [])
 	{
+        if (empty($data))
+            throw new \InvalidArgumentException('Data is empty');
+        
 		$this->data = $data;
 		$this->markerRadius = $options['marker-radius'] ?? 0;
 		$this->markerColor = $options['marker-color'] ?? '#00A';

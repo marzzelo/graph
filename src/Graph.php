@@ -33,8 +33,11 @@ class Graph
 			'marker-color'  => '#00A',
 		],
 
-		'csv.separator' => ',',
-		'csv.skip'      => 0,
+        'csv' => [
+            'delimiter' => ';',
+            'skip'      => 0,
+        ],
+		
 	];
 
 	private ?IFrame $frame = null;
@@ -66,13 +69,7 @@ class Graph
 		return $this;
 	}
 
-	public function addOptions(array $options): array
-	{
-		// update $this->options with new $options:
-		$this->options = array_merge($this->options, $options);
-		return $this->options;
-	}
-
+	
 	/**
 	 * @param  array  $data     2D array of data in the form [[t, x, y, z], [t, x, y, z], ...]
 	 * @param  array  $options  array of options
@@ -107,6 +104,48 @@ class Graph
 
 	}
 
+    public function fromCsv(string $csvFile, array $options = []): Image {
+        $options = $this->addOptions($options);
+
+        $this->frame = new Frame(
+            $options['frame']
+        );
+
+        $csvReader = new CsvFileReader($csvFile, $options['csv']['delimiter'], $options['csv']['skip']);
+
+        $this->headers = $csvReader->getHeaders();
+
+        foreach ($csvReader->getRawData() as $data_n) {
+            $this->series[] = new DataSet(
+                $data_n,
+                $options['dataset']);
+        }
+
+        
+        $this->axis = (new AutoAxis(
+            $this->series,
+            $this->frame,
+            $options['axis']
+        ));
+
+        $canvas = $this->axis->draw();  // ejes, grilla, labels, title
+
+        foreach ($this->series as $dataSet) {
+            $dataSet->draw($this->axis);    // points, curves
+        }
+
+        return $canvas;
+    }
+
+
+    public function addOptions(array $options): array
+	{
+		// update $this->options with new $options:
+		$this->options = array_merge($this->options, $options);
+		return $this->options;
+	}
+
+
 	public function addDataSet(IDataSet $dataSet): Graph
 	{
 		$this->series[] = $dataSet;
@@ -122,6 +161,9 @@ class Graph
 
 	public function setDataSets(array $dataSets): self
 	{
+        if (! $dataSets instanceof IDataSet) 
+            throw new \InvalidArgumentException('DataSets must be an array of IDataSet objects');
+
 		$this->series = $dataSets;
 		return $this;
 	}
@@ -129,7 +171,7 @@ class Graph
 	public function render(): Image
 	{
 		if ($this->headers) {
-			$this->axis->setLabels($this->headers);
+			$this->axis->setLabels(...$this->headers);
 		}
 		$canvas = $this->axis->draw();  // ejes, grilla, labels, title
 

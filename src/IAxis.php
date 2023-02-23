@@ -17,6 +17,8 @@ interface IAxis
 
 	public function ymax(): float;
 
+    public function setLabels(string $labelx, string $labely): IAxis;
+
 	public function getCanvas(): Image;
 
 	public function XY(float $x, float $y): array;

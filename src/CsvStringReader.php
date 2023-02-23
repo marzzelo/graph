@@ -42,7 +42,10 @@ class CsvStringReader implements IReader
 	private array $dataSets = [];
 
 
-	public function __construct(string $csvString, string $delimiter = "\t", bool $hasHeaders = true)
+    private array $data = [];
+
+
+	public function __construct(string $csvString, string $delimiter = "\t", int $skip = 0)
 	{
 		// $this->write($csvString);
 
@@ -50,8 +53,8 @@ class CsvStringReader implements IReader
 
 		// $this->write($rows);
 
-		if ($hasHeaders) {
-			$this->extractHeaders($rows);
+		if ($skip >= 0) {
+			$this->extractHeaders($rows, $skip);
 		}
 
 		// $this->write($rows, "ROWS");
@@ -70,6 +73,8 @@ class CsvStringReader implements IReader
 			}
 		}
 
+        $this->data = $series;  // raw data
+
 		foreach ($series as $serie) {
 			$this->dataSets[] = new DataSet($serie);
 		}
@@ -87,6 +92,11 @@ class CsvStringReader implements IReader
 		return $this->headers;
 	}
 
+    public function getRawData(): array
+    {
+        return $this->data;
+    }
+
 
 	protected function csvToArray($csvString, $delimiter = ',', $lineBreak = "\n"): array
 	{
@@ -102,18 +112,19 @@ class CsvStringReader implements IReader
 	/**
 	 * @param array $rows
 	 */
-	private function extractHeaders(array &$rows)
+	private function extractHeaders(array &$rows, int $skip = 0): void
 	{
 		// rows: [ ["labelx", "labely1", "labely2",...], [x,y1,y2...], [x,y1,y2...] ]
-		$header = array_splice($rows, 0, 1)[0];
+
+        // skip first $skip rows
+        for ($i = 0; $i < $skip; $i++) {
+            array_shift($rows);
+        }
+
+        $this->headers = array_shift($rows);
 
 		// header: ['labelx', 'labely1', 'labely2', ...]
-		$this->headers[0] = $header[0];
-
-		array_splice($header, 0, 1);
-		$this->headers[1] = implode(', ', $header);
-
-		// [ "x" => "time", "y" => "distance, velocity" ]
+		
 	}
 
 

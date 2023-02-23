@@ -36,11 +36,15 @@ class BasicAxis implements IAxis
 	 * @param  float                  $xM     X max
 	 * @param  float                  $ym     Y min
 	 * @param  float                  $yM     Y max
-	 * @param  \Marzzelo\Graph\Frame  $frame  Frame object
+	 * @param  \Marzzelo\Graph\IFrame  $frame  IFrame implementing object
 	 * @param  array                  $options
 	 */
-	public function __construct(float $xm, float $xM, float $ym, float $yM, Frame &$frame, array $options = [])
+	public function __construct(float $xm, float $xM, float $ym, float $yM, IFrame &$frame, array $options = [])
 	{
+        // $frame must be an object implementing IFrame
+        if (!($frame instanceof IFrame))
+            throw new \Exception('Invalid frame provided (must be an object implementing IFrame)');
+            
 		$this->options = $options;
 
 		if (($xm == $xM) || ($ym == $yM)) {
@@ -111,7 +115,7 @@ class BasicAxis implements IAxis
 				? '%.2f'
 				: '%.0f';
 			if ($i != 0)
-				$canvas->text(sprintf($format, $i * $sy), $xn - 5, $yn, function ($font) {
+				$canvas->text(sprintf($format, $i * $sy), (int) $xn - 5, $yn, function ($font) {
 					$font->align('right');
 				});
 		}
@@ -204,5 +208,14 @@ class BasicAxis implements IAxis
 	public function getCanvas(): Image
 	{
 		return $this->canvas;
+	}
+	/**
+	 * @param string $labelx
+	 * @param string $labely
+	 */
+	public function setLabels(string $labelx, string $labely): self  {
+        $this->xlabel = $labelx;
+        $this->ylabel = $labely;
+        return $this;
 	}
 }

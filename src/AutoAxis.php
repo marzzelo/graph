@@ -14,9 +14,17 @@ class AutoAxis extends BasicAxis implements IAxis
 	 * @param  \Marzzelo\Graph\Frame  $frame  Frame object
 	 * @param  array                  $options
 	 */
-	public function __construct(array $data, Frame &$frame, $options = [])
+	public function __construct(array $dataSets, Frame &$frame, $options = [])
 	{
-		[$xm, $xM, $ym, $yM] = $this->endpoints($data);
+        if (count($dataSets) == 0)
+            throw new \Exception('No data provided');
+
+        // $data must be an array of IDataSet objects
+        if (!($dataSets[0] instanceof IDataSet))
+            throw new \InvalidArgumentException('Invalid data provided (must be an array of IDataSet objects)');
+            
+
+		[$xm, $xM, $ym, $yM] = $this->endpoints($dataSets);
 		parent::__construct($xm, $xM, $ym, $yM, $frame, $options);
 	}
 
