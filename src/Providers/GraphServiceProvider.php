@@ -2,6 +2,7 @@
 
 namespace Marzzelo\Graph\Providers;
 
+use Illuminate\Support\Facades\Blade;
 use Marzzelo\Graph\Graph;
 use Illuminate\Support\ServiceProvider;
 
@@ -16,7 +17,7 @@ class GraphServiceProvider extends ServiceProvider
 	public function register(): void
 	{
 		// load configuration file
-		$this->mergeConfigFrom(__DIR__ . '/../../config/graph.php', 'graph');
+		$this->mergeConfigFrom($this->basePath('config/graph.php'), 'graph');
 
 		// register the graph service
 		$this->app->bind('graph', function ($app, $params) {
@@ -30,10 +31,28 @@ class GraphServiceProvider extends ServiceProvider
 		// Se ejecuta antes de que se resuelvan las rutas, middleware, vistas, comandos, etc.
 
 		// cargar rutas del paquete
-		$this->loadRoutesFrom(__DIR__ . '/../../routes/web.php');
+		$this->loadRoutesFrom($this->basePath('routes/web.php'));
 
 		// cargar vistas del paquete
-		$this->loadViewsFrom(__DIR__ . '/../../resources/views', 'graph');
+		$this->loadViewsFrom($this->basePath('resources/views'), 'graph');
+
+        // registrar vistas para vendor:publish
+        $this->publishes([
+            $this->basePath('resources/views') => resource_path('views/vendor/graph'),
+        ], 'marzzelo:graph-views');
+
+        // registrar configuración para vendor:publish
+        $this->publishes([
+            $this->basePath('config/graph.php') => config_path('graph.php'),
+        ], 'marzzelo:graph-config');
+
+        // cargar componentes de Blade
+        Blade::componentNamespace('Graph\\Views\\Components', 'graph');
 
 	}
+
+    private function basePath(string $path): string
+    {
+        return __DIR__ . '/../../' . $path;
+    }
 }

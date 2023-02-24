@@ -42,7 +42,7 @@ class ConfigTest extends TestCase
 	 */
 	public function can_get_the_message_throug_a_view() {
 		$this->withoutExceptionHandling();
-		$response = $this->get('/graph')
+		$response = $this->get('/test-graph')
 			->assertViewIs('graph::graph-test');
 
 	}

@@ -2,7 +2,6 @@
 
 namespace Marzzelo\Graph\Http\Controllers;
 
-use Marzzelo\Graph\Facades\Graph;
 use Illuminate\Routing\Controller;
 use Illuminate\Contracts\View\View;
 use Illuminate\Contracts\View\Factory;
@@ -12,8 +11,11 @@ class GraphController extends Controller
 {
 	public function index(): Factory|View|Application
 	{
+        $items = config('graph');
+        $message = print_r($items, true);
+
 		return view('graph::graph-test', [
-			'message' => Graph::hello('Route')
+			'message' => $message
 		]);
 	}
 }

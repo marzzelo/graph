@@ -8,38 +8,7 @@ use InvalidArgumentException;
 
 class Graph
 {
-	// private array $options = [
-	// 	'frame' => [
-	// 		'width_px'         => 640,
-	// 		'height_px'        => 400,
-	// 		'background_color' => '#FFE',
-	// 		'frame_color'      => '#bbb',
-	// 	],
-	//
-	// 	'axis' => [
-	// 		'grid-size-xy'   => [null, null],
-	// 		'labels' => [null, null],
-	// 		'margin' => 20,  // can be array [x, y] or int
-	// 		'title'  => '',
-	// 		'title-color' => '#000',
-	// 		'axis-color'  => '#555', // color of axis lines
-	// 		'grid-color' => '#ddd',
-	// 		'background-color' => '#fff',
-	// 		'labels-color' => '#555',
-	// 	],
-	//
-	// 	'dataset' => [
-	// 		'line-color' => '#00A',
-	// 		'marker-radius' => 0,
-	// 		'marker-color'  => '#00A',
-	// 	],
-	//
-    //     'csv' => [
-    //         'delimiter' => ';',
-    //         'skip'      => 0,
-    //     ],
-	//
-	// ];
+	
 	private array $options;
 
 	private ?IFrame $frame = null;
@@ -61,7 +30,7 @@ class Graph
 	 */
 	public function __construct(?IAxis $axis = null)
 	{
-		$this->options = config('graph');
+		$this->options = config('graph', 'default-options');
 		if ($axis)
 			$this->make($axis);
 	}
