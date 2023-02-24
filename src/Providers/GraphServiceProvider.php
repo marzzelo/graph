@@ -2,11 +2,7 @@
 
 namespace Marzzelo\Graph\Providers;
 
-use Marzzelo\Graph\Frame;
 use Marzzelo\Graph\Graph;
-use Marzzelo\Graph\DataSet;
-use Marzzelo\Graph\AutoAxis;
-use Marzzelo\Graph\BasicAxis;
 use Illuminate\Support\ServiceProvider;
 
 class GraphServiceProvider extends ServiceProvider
@@ -19,32 +15,22 @@ class GraphServiceProvider extends ServiceProvider
 	 */
 	public function register(): void
 	{
+		// load configuration file
+		$this->mergeConfigFrom(__DIR__ . '/../../config/graph.php', 'graph');
+
 		// register the graph service
 		$this->app->bind('graph', function ($app, $params) {
 			return new Graph(...$params);
-		});
-
-		$this->app->bind('frame', function ($app, $params) {
-			return new Frame(...$params);
-		});
-
-		$this->app->bind('dataSet', function ($app, $params) {
-			return new DataSet(...$params);
-		});
-
-		$this->app->bind('autoAxis', function ($app, $params) {
-			// $frame = $this->app->make('frame'); // instanciates a Frame object with default values
-			return new AutoAxis(...$params);
-		});
-
-		$this->app->bind('basicAxis', function ($app, $params) {
-			// $frame = $this->app->make('frame'); // instanciates a Frame object with default values
-			return new BasicAxis(...$params);
 		});
 	}
 
 	public function boot()
 	{
 		// boot() se ejecuta al finalizar el registro de todos los Service Providers.
+		// Se ejecuta antes de que se resuelvan las rutas, middleware, vistas, comandos, etc.
+
+		// cargar rutas del paquete
+		$this->loadRoutesFrom(__DIR__ . '/../../routes/web.php');
+
 	}
 }

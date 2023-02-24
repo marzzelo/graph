@@ -30,5 +30,6 @@ return [
         'delimiter' => ',',
         'skip'      => 0,
     ],
+    'test'    => 'Eureka!'
 
 ];

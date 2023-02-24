@@ -41,10 +41,6 @@ class BasicAxis implements IAxis
 	 */
 	public function __construct(float $xm, float $xM, float $ym, float $yM, IFrame &$frame, array $options = [])
 	{
-        // $frame must be an object implementing IFrame
-        if (!($frame instanceof IFrame))
-            throw new \Exception('Invalid frame provided (must be an object implementing IFrame)');
-            
 		$this->options = $options;
 
 		if (($xm == $xM) || ($ym == $yM)) {
@@ -175,6 +171,12 @@ class BasicAxis implements IAxis
 		return $canvas;
 	}
 
+	/**
+	 * This function returns the coordinates of the point (x,y) in the canvas coordinate system.
+	 * @param  float  $x
+	 * @param  float  $y
+	 * @return array
+	 */
 	public function XY(float $x, float $y): array
 	{
 		$W = $this->canvas->width();
@@ -209,9 +211,11 @@ class BasicAxis implements IAxis
 	{
 		return $this->canvas;
 	}
+
 	/**
-	 * @param string $labelx
-	 * @param string $labely
+	 * @param  string  $labelx
+	 * @param  string  $labely
+	 * @return \Marzzelo\Graph\BasicAxis
 	 */
 	public function setLabels(string $labelx, string $labely): self  {
         $this->xlabel = $labelx;

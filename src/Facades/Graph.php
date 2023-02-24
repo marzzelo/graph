@@ -5,6 +5,9 @@ namespace Marzzelo\Graph\Facades;
 use Marzzelo\Graph\IAxis;
 use Illuminate\Support\Facades\Facade;
 
+/**
+ * @method static hello()
+ */
 class Graph extends Facade
 {
 

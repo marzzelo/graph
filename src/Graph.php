@@ -4,41 +4,43 @@ declare(strict_types=1);
 namespace Marzzelo\Graph;
 
 use Intervention\Image\Image;
+use InvalidArgumentException;
 
 class Graph
 {
-	private array $options = [
-		'frame' => [
-			'width_px'         => 640,
-			'height_px'        => 400,
-			'background_color' => '#FFE',
-			'frame_color'      => '#bbb',
-		],
-
-		'axis' => [
-			'grid-size-xy'   => [null, null],
-			'labels' => [null, null],
-			'margin' => 20,  // can be array [x, y] or int
-			'title'  => '',
-			'title-color' => '#000',
-			'axis-color'  => '#555', // color of axis lines
-			'grid-color' => '#ddd',
-			'background-color' => '#fff',
-			'labels-color' => '#555',
-		],
-
-		'dataset' => [
-			'line-color' => '#00A',
-			'marker-radius' => 0,
-			'marker-color'  => '#00A',
-		],
-
-        'csv' => [
-            'delimiter' => ';',
-            'skip'      => 0,
-        ],
-		
-	];
+	// private array $options = [
+	// 	'frame' => [
+	// 		'width_px'         => 640,
+	// 		'height_px'        => 400,
+	// 		'background_color' => '#FFE',
+	// 		'frame_color'      => '#bbb',
+	// 	],
+	//
+	// 	'axis' => [
+	// 		'grid-size-xy'   => [null, null],
+	// 		'labels' => [null, null],
+	// 		'margin' => 20,  // can be array [x, y] or int
+	// 		'title'  => '',
+	// 		'title-color' => '#000',
+	// 		'axis-color'  => '#555', // color of axis lines
+	// 		'grid-color' => '#ddd',
+	// 		'background-color' => '#fff',
+	// 		'labels-color' => '#555',
+	// 	],
+	//
+	// 	'dataset' => [
+	// 		'line-color' => '#00A',
+	// 		'marker-radius' => 0,
+	// 		'marker-color'  => '#00A',
+	// 	],
+	//
+    //     'csv' => [
+    //         'delimiter' => ';',
+    //         'skip'      => 0,
+    //     ],
+	//
+	// ];
+	private array $options;
 
 	private ?IFrame $frame = null;
 
@@ -59,6 +61,7 @@ class Graph
 	 */
 	public function __construct(?IAxis $axis = null)
 	{
+		$this->options = config('graph');
 		if ($axis)
 			$this->make($axis);
 	}
@@ -69,10 +72,11 @@ class Graph
 		return $this;
 	}
 
-	
+
 	/**
 	 * @param  array  $data     2D array of data in the form [[t, x, y, z], [t, x, y, z], ...]
 	 * @param  array  $options  array of options
+	 * @throws \Exception
 	 */
 	public function fromArray(array $data, array $options = []): Image
 	{
@@ -104,7 +108,18 @@ class Graph
 
 	}
 
-    public function fromCsv(string $csvFile, array $options = []): Image {
+	/**
+	 * Returns a canvas with the graph. The graph is drawn using the data from a csv file.
+	 * To save the image to a file, use the save() method of the returned object.
+	 * To generate an encoded64 image, use the render64() method of the returned object.
+	 *
+	 * @param  string  $csvFile  path to csv file
+	 *                           first row must be the headers
+	 * @param  array  $options   array of options
+	 * @return \Intervention\Image\Image
+	 * @throws \Exception
+	 */
+	public function fromCsv(string $csvFile, array $options = []): Image {
         $options = $this->addOptions($options);
 
         $this->frame = new Frame(
@@ -155,19 +170,25 @@ class Graph
 
 	public function addDataSets(array $dataSets): self
 	{
+		if (! $dataSets[0] instanceof IDataSet)
+			throw new InvalidArgumentException('DataSets must be an array of IDataSet objects');
 		$this->series = array_merge($this->series, $dataSets);
 		return $this;
 	}
 
 	public function setDataSets(array $dataSets): self
 	{
-        if (! $dataSets instanceof IDataSet) 
-            throw new \InvalidArgumentException('DataSets must be an array of IDataSet objects');
+        if (! $dataSets[0] instanceof IDataSet)
+            throw new InvalidArgumentException('DataSets must be an array of IDataSet objects');
 
 		$this->series = $dataSets;
 		return $this;
 	}
 
+	/**
+	 * Draws the graph, incluiding the axis, grid, labels, title, and the data sets.
+	 * @return \Intervention\Image\Image
+	 */
 	public function render(): Image
 	{
 		if ($this->headers) {
@@ -182,6 +203,11 @@ class Graph
 		return $canvas;
 	}
 
+	/**
+	 * Generates a base64 string with the image data, for use in HTML.
+	 * @param  string  $format
+	 * @return string
+	 */
 	public function render64(string $format = 'png'): string
 	{
 		$img64 = base64_encode((string)$this->render()->encode($format));
@@ -189,36 +215,55 @@ class Graph
 		return "data:image/$format;base64,$img64";
 	}
 
-	// Factory a Frame object
-	public static function getFrame(array $options): Frame
-	{
-		return new Frame($options);
-	}
+	// // Factory a Frame object
+	// public static function getFrame(array $options): Frame
+	// {
+	// 	return new Frame($options);
+	// }
+	//
+	// public static function getDataSet(array $data, array $options): DataSet
+	// {
+	// 	return new DataSet($data, $options);
+	// }
+	//
+	// /**
+	//  * @throws \Exception
+	//  */
+	// public static function getBasicAxis(float $xm, float $xM, float $ym, float $yM, Frame &$frame, $margin = 20):
+	// BasicAxis
+	// {
+	// 	return new BasicAxis($xm, $xM, $ym, $yM, $frame, $margin);
+	// }
+	//
+	// /**
+	//  * @throws \Exception
+	//  */
+	// public static function getAutoAxis(array $dataSets, Frame &$frame, $margin = 20): AutoAxis
+	// {
+	// 	return new AutoAxis($dataSets, $frame, $margin);
+	// }
+	//
+	// public static function getCsvFileReader(string $csvFile, string $delimiter = "\t", bool $hasHeaders = true):
+	// CsvFileReader
+	// {
+	// 	return new CsvFileReader($csvFile, $delimiter, $hasHeaders);
+	// }
 
-	public static function getDataSet(array $data, array $options): DataSet
-	{
-		return new DataSet($data, $options);
-	}
-
-	public static function getBasicAxis(float $xm, float $xM, float $ym, float $yM, Frame &$frame, $margin = 20):
-	BasicAxis
-	{
-		return new BasicAxis($xm, $xM, $ym, $yM, $frame, $margin);
-	}
-
-	public static function getAutoAxis(array $dataSets, Frame &$frame, $margin = 20): AutoAxis
-	{
-		return new AutoAxis($dataSets, $frame, $margin);
-	}
-
-	public static function getCsvFileReader(string $csvFile, string $delimiter = "\t", bool $hasHeaders = true):
-	CsvFileReader
-	{
-		return new CsvFileReader($csvFile, $delimiter, $hasHeaders);
-	}
-
+	/**
+	 * This method is used to clamp a value between a minimum and maximum value.
+	 * It returns the value if it is between the min and max, or the min or max if it is outside that range.
+	 * @param  float  $x
+	 * @param  float  $min
+	 * @param  float  $max
+	 * @return float $x clamped between $min and $max
+	 */
 	public static function confineTo(float $x, float $min, float $max): float
 	{
 		return min(max($min, $x), $max);
+	}
+
+	public function hello(string $name = 'World'): string
+	{
+		return "Hello $name!";
 	}
 }
