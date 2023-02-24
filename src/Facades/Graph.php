@@ -18,6 +18,7 @@ class Graph extends Facade
 	 * @method static frame(int $width_px = 800, int $height_px = 600, string $background_color = '#FFD', string $frame_color = '#BBB')
 	 * @method static dataSet(array $data, int $radius = 0, string $color = '#0AA')
 	 * @method static make(IAxis $x)
+	 * @method static hello(string $name = 'World')
 	 * @throws \RuntimeException
 	 */
 	protected static function getFacadeAccessor(): string

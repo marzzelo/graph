@@ -32,5 +32,8 @@ class GraphServiceProvider extends ServiceProvider
 		// cargar rutas del paquete
 		$this->loadRoutesFrom(__DIR__ . '/../../routes/web.php');
 
+		// cargar vistas del paquete
+		$this->loadViewsFrom(__DIR__ . '/../../resources/views', 'graph');
+
 	}
 }

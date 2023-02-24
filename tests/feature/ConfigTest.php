@@ -36,4 +36,14 @@ class ConfigTest extends TestCase
 		$response->assertStatus(200);
 		$response->assertSee('Hello Route!');
 	}
+
+	/** @test
+	 * can access the route /graph
+	 */
+	public function can_get_the_message_throug_a_view() {
+		$this->withoutExceptionHandling();
+		$response = $this->get('/graph')
+			->assertViewIs('graph::graph-test');
+
+	}
 }

@@ -1,8 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Marzzelo\Graph\Facades\Graph as FGraph;
+use Marzzelo\Graph\Http\Controllers\GraphController;
 
-Route::get('graph', function () {
-	return FGraph::hello('Route');
-});
+Route::get('graph', [GraphController::class, 'index']);
