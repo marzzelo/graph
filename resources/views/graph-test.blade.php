@@ -1,16 +1,18 @@
-<x-graph::layout>
+<x-app-layout>
 	<x-slot name="title">
 		{{ $title ?? 'Marzzelo/Graph Package Test' }}
 	</x-slot>
 	
 	<x-slot name="header">
 		<h3>
-		{{ $headerText ?? 'Marzzelo/Graph Package Test' }}
+		{{ $headerText ?? __('graph::graph.packtest') }}
 		</h3>
 	</x-slot>
 	
 	{{-- MAIN SECTION --}}
-	<pre>{!!$message!!}</pre>
+    <div class="graph-test">
+	    <pre>{!!$message!!}</pre>
+    </div>
 	
 	{{-- GRAPH SECTION --}}
 	<div class=''>
@@ -22,4 +24,4 @@
 		<h3>Graph 2: From CSV File</h3>
 		{{-- <img src="{{$graph2}}" alt='' class='' /> --}}
 	</div>
-</x-graph::layout>
+</x-app-layout>

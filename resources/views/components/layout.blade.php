@@ -8,9 +8,11 @@
 	<meta name="csrf-token" content="{{ csrf_token() }}">
 	
 	<title>{{ $title ?? 'Marzzelo/Graph Package' }}</title>
-	<!-- Fonts -->
+	
+    <!-- Fonts -->
 	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap">
-	<!-- Styles -->
+	
+    <!-- Styles -->
 	<link rel="stylesheet" href="/resources/static/css/graph.css">
 
 	<script src="/resources/static/js/graph.js"></script>
@@ -19,7 +21,7 @@
 	<link rel="shortcut icon" item="image/png" href={{ 'graph.png' }} />
 </head>
 
-<body class="relative font-sans antialiased">
+<body>
 
 <div class="">
 

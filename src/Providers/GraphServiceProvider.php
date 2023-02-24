@@ -36,6 +36,9 @@ class GraphServiceProvider extends ServiceProvider
 		// cargar vistas del paquete
 		$this->loadViewsFrom($this->basePath('resources/views'), 'graph');
 
+        // cargar traducciones del paquete
+        $this->loadTranslationsFrom($this->basePath('resources/lang'), 'graph');
+
         // registrar vistas para vendor:publish
         $this->publishes([
             $this->basePath('resources/views') => resource_path('views/vendor/graph'),
@@ -45,6 +48,16 @@ class GraphServiceProvider extends ServiceProvider
         $this->publishes([
             $this->basePath('config/graph.php') => config_path('graph.php'),
         ], 'marzzelo:graph-config');
+
+        // registrar traducciones para vendor:publish
+        $this->publishes([
+            $this->basePath('resources/lang') => resource_path('lang/vendor/graph'),
+        ], 'marzzelo:graph-translations');
+
+        // registrar assets para vendor:publish
+        $this->publishes([
+            $this->basePath('resources/static') => public_path('vendor/graph'),
+        ], 'marzzelo:graph-assets');
 
         // cargar componentes de Blade
         Blade::componentNamespace('Graph\\Views\\Components', 'graph');
