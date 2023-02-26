@@ -8,31 +8,27 @@ use Intervention\Image\Facades\Image as FImage;
 
 class Frame implements IFrame
 {
-	private int $width_px;
-
-	private int $height_px;
-
-	private string $background_color;
-
-	private string $frame_color;
+	private array $options;
 
 	private ?Image $canvas = null;
 
 
 	public function __construct(array $options)
 	{
-		$this->width_px = $options['width-px'] ?? 640;
-		$this->height_px = $options['height-px'] ?? 400;
-		$this->background_color = $options['background-color'] ?? '#FFE';
-		$this->frame_color = $options['frame-color'] ?? '#bbb';
+		$this->options = $options;
 
-		$this->canvas = FImage::canvas($this->width_px, $this->height_px, $this->background_color)
+		$width_px = $options['width-px'] ?? 640;
+		$height_px = $options['height-px'] ?? 480;
+		$background_color = $options['background-color'] ?? '#FFE';
+		$frame_color = $options['frame-color'] ?? '#bbb';
+
+		$this->canvas = FImage::canvas($width_px, $height_px, $background_color)
 		                ->rectangle(0,
 			                0,
-			                $this->width_px - 1,
-			                $this->height_px - 1,
-			                function ($draw) {
-				                $draw->border(1, $this->frame_color);
+			                $width_px - 1,
+			                $height_px - 1,
+			                function ($draw) use ($frame_color) {
+				                $draw->border(1, $frame_color);
 			                }
 		                );
 
@@ -41,5 +37,10 @@ class Frame implements IFrame
 	public function getCanvas(): Image
 	{
 		return $this->canvas;
+	}
+
+	public function getOptions(): array
+	{
+		return $this->options;
 	}
 }

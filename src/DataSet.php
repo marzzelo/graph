@@ -70,11 +70,12 @@ class DataSet implements IDataSet
 
 		[$X0, $Y0] = $axis->XY($this->data[0][0], $this->data[0][1]);
 
-		foreach ($this->data as $xy) {
+		foreach ($this->data as $i => $xy) {
 			[$X, $Y] = $axis->XY($xy[0], $xy[1]);
 
 			$canvas->line($X0, $Y0, $X, $Y, function ($draw) {
-				$draw->color($this->lineColor);
+				$color = $this->lineColor ?? '#00A';
+				$draw->color($color);
 			});
 			if ($this->markerRadius) {
 				$canvas->circle($this->markerRadius, $X, $Y, function ($draw) {

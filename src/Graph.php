@@ -8,10 +8,8 @@ use InvalidArgumentException;
 
 class Graph
 {
-	
-	private array $options;
 
-	private ?IFrame $frame = null;
+	private array $options;
 
 	private ?IAxis $axis = null;
 
@@ -20,7 +18,7 @@ class Graph
 	 */
 	private array $series = [];  // DataSet objects
 
-	private array $headers = [];
+	private array $labels = [];
 
 
 	/**
@@ -30,51 +28,26 @@ class Graph
 	 */
 	public function __construct(?IAxis $axis = null)
 	{
-		$this->options = config('graph', 'default-options');
+		$this->options = config('graph.default-options', []);
 		if ($axis)
-			$this->make($axis);
+			$this->axis = $axis;
 	}
-
-	public function make(IAxis $axis): Graph
-	{
-		$this->axis = $axis;
-		return $this;
-	}
-
 
 	/**
+	 * Returns a canvas with the graph. The graph is drawn using the data from a 2D array.
+	 * To save the image to a file, use the save() method of the returned object.
+	 * To generate an encoded64 image, use the render64() method of the returned object.
+	 *
 	 * @param  array  $data     2D array of data in the form [[t, x, y, z], [t, x, y, z], ...]
 	 * @param  array  $options  array of options
+	 * @return \Marzzelo\Graph\Graph
 	 * @throws \Exception
 	 */
-	public function fromArray(array $data, array $options = []): Image
+	public function fromArray(array $data, array $options = []): Graph
 	{
-		$options = $this->addOptions($options);
+		$options = $this->updateOptions($options);
 
-		$this->frame = new Frame(
-			$options['frame']
-		);
-
-		foreach ($data as $data_n) {
-			$this->series[] = new DataSet(
-				$data_n,
-				$options['dataset']);
-		}
-
-		$this->axis = (new AutoAxis(
-			$this->series,
-			$this->frame,
-			$options['axis']
-		));
-
-		$canvas = $this->axis->draw();  // ejes, grilla, labels, title
-
-		foreach ($this->series as $dataSet) {
-			$dataSet->draw($this->axis);    // points, curves
-		}
-
-		return $canvas;
-
+		return $this->makeGraph($options, $data);
 	}
 
 	/**
@@ -84,48 +57,33 @@ class Graph
 	 *
 	 * @param  string  $csvFile  path to csv file
 	 *                           first row must be the headers
-	 * @param  array  $options   array of options
-	 * @return \Intervention\Image\Image
+	 * @param  array   $options  array of options
+	 * @return \Marzzelo\Graph\Graph
 	 * @throws \Exception
 	 */
-	public function fromCsv(string $csvFile, array $options = []): Image {
-        $options = $this->addOptions($options);
+	public function fromCsv(string $csvFile, array $options = []): Graph
+	{
+		$options = $this->updateOptions($options);
 
-        $this->frame = new Frame(
-            $options['frame']
-        );
+		$csvReader = new CsvFileReader($csvFile, $options['csv']['delimiter'], $options['csv']['skip']);
 
-        $csvReader = new CsvFileReader($csvFile, $options['csv']['delimiter'], $options['csv']['skip']);
+		$this->labels = $csvReader->getHeaders();
 
-        $this->headers = $csvReader->getHeaders();
+		// if set, override the labels from the options array:
+		$this->labels[0] = $options['axis']['labels'][0] ?? $this->labels[0];
+		$this->labels[1] = $options['axis']['labels'][1] ?? $this->labels[1];
 
-        foreach ($csvReader->getRawData() as $data_n) {
-            $this->series[] = new DataSet(
-                $data_n,
-                $options['dataset']);
-        }
+		$data = $csvReader->getRawData();
 
-        
-        $this->axis = (new AutoAxis(
-            $this->series,
-            $this->frame,
-            $options['axis']
-        ));
-
-        $canvas = $this->axis->draw();  // ejes, grilla, labels, title
-
-        foreach ($this->series as $dataSet) {
-            $dataSet->draw($this->axis);    // points, curves
-        }
-
-        return $canvas;
-    }
+		return $this->makeGraph($options, $data);
+	}
 
 
-    public function addOptions(array $options): array
+	public function updateOptions(array $options): array
 	{
 		// update $this->options with new $options:
-		$this->options = array_merge($this->options, $options);
+
+		$this->options = array_replace_recursive($this->options, $options);
 		return $this->options;
 	}
 
@@ -139,7 +97,7 @@ class Graph
 
 	public function addDataSets(array $dataSets): self
 	{
-		if (! $dataSets[0] instanceof IDataSet)
+		if (!$dataSets[0] instanceof IDataSet)
 			throw new InvalidArgumentException('DataSets must be an array of IDataSet objects');
 		$this->series = array_merge($this->series, $dataSets);
 		return $this;
@@ -147,8 +105,8 @@ class Graph
 
 	public function setDataSets(array $dataSets): self
 	{
-        if (! $dataSets[0] instanceof IDataSet)
-            throw new InvalidArgumentException('DataSets must be an array of IDataSet objects');
+		if (!$dataSets[0] instanceof IDataSet)
+			throw new InvalidArgumentException('DataSets must be an array of IDataSet objects');
 
 		$this->series = $dataSets;
 		return $this;
@@ -156,13 +114,15 @@ class Graph
 
 	/**
 	 * Draws the graph, incluiding the axis, grid, labels, title, and the data sets.
+	 *
 	 * @return \Intervention\Image\Image
 	 */
 	public function render(): Image
 	{
-		if ($this->headers) {
-			$this->axis->setLabels(...$this->headers);
+		if ($this->labels) {
+			$this->axis->setLabels(...$this->labels);
 		}
+
 		$canvas = $this->axis->draw();  // ejes, grilla, labels, title
 
 		foreach ($this->series as $dataSet) {
@@ -174,6 +134,7 @@ class Graph
 
 	/**
 	 * Generates a base64 string with the image data, for use in HTML.
+	 *
 	 * @param  string  $format
 	 * @return string
 	 */
@@ -184,43 +145,23 @@ class Graph
 		return "data:image/$format;base64,$img64";
 	}
 
-	// // Factory a Frame object
-	// public static function getFrame(array $options): Frame
-	// {
-	// 	return new Frame($options);
-	// }
-	//
-	// public static function getDataSet(array $data, array $options): DataSet
-	// {
-	// 	return new DataSet($data, $options);
-	// }
-	//
-	// /**
-	//  * @throws \Exception
-	//  */
-	// public static function getBasicAxis(float $xm, float $xM, float $ym, float $yM, Frame &$frame, $margin = 20):
-	// BasicAxis
-	// {
-	// 	return new BasicAxis($xm, $xM, $ym, $yM, $frame, $margin);
-	// }
-	//
-	// /**
-	//  * @throws \Exception
-	//  */
-	// public static function getAutoAxis(array $dataSets, Frame &$frame, $margin = 20): AutoAxis
-	// {
-	// 	return new AutoAxis($dataSets, $frame, $margin);
-	// }
-	//
-	// public static function getCsvFileReader(string $csvFile, string $delimiter = "\t", bool $hasHeaders = true):
-	// CsvFileReader
-	// {
-	// 	return new CsvFileReader($csvFile, $delimiter, $hasHeaders);
-	// }
+	/**
+	 * Saves the image to a file.
+	 *
+	 * @param  string  $filename
+	 * @param  int     $quality
+	 * @return \Intervention\Image\Image
+	 */
+	public function save(string $filename, int $quality = 90): Image
+	{
+		return $this->render()->save($filename, $quality);
+	}
+
 
 	/**
 	 * This method is used to clamp a value between a minimum and maximum value.
 	 * It returns the value if it is between the min and max, or the min or max if it is outside that range.
+	 *
 	 * @param  float  $x
 	 * @param  float  $min
 	 * @param  float  $max
@@ -234,5 +175,38 @@ class Graph
 	public function hello(string $name = 'World'): string
 	{
 		return "Hello $name!";
+	}
+
+	/**
+	 * @param  array  $options
+	 * @param  array  $data
+	 * @return $this
+	 * @throws \Exception
+	 */
+	public function makeGraph(array $options, array $data): Graph
+	{
+		$frame = new Frame(
+			$options['frame']
+		);
+
+		$this->series = [];
+
+		foreach ($data as $i => $data_n) {
+			$this->series[] = new DataSet(
+				$data_n,
+				$options['datasets'][$i] ?? []);
+		}
+
+		$this->axis = (new AutoAxis(
+			$this->series,
+			$frame,
+			$options['axis']
+		));
+
+		foreach ($this->series as $dataSet) {
+			$dataSet->draw($this->axis);    // points, curves
+		}
+
+		return $this;
 	}
 }

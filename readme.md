@@ -2,27 +2,156 @@
 
 Marzzelo/Graph is a simple Cartesian Graph creation library in PHP, with Laravel support.
 
+## Features
+
+
 ![Single dataset plot](./screenshot1.png "graph") 
 
 ## Installation
 
-Use Composer to install Graph.
+Use [Composer](https://getcomposer.org/) to install Graph from [Packagist](https://packagist.org/packages/marzzelo/graph)
+
 
 ```bash
 composer require marzzelo/graph
 ```
 
-## Usage
+## Basic Usage
 
-### CASE 1: Array of data sets in memory
-
-- Define the datasets to plot in the form: `$data = [[x0,y0], [x1,y1], ...]`
+- Define the datasets to plot in the form: 
 ```php
-$data1 = [[-1500, 1000], [-1000, 800], [-500, 100], [0, -100], [1000, 900], [1500, 1200]];
-$data2 = [[-1500, 1200], [-1000, 1000], [-500, 200], [0, 0], [1000, 1100], [1500, 1400]];
-...
-$dataN = [...];
+$data = [[x0,y0], [x1,y1], ...]
 ```
+```php
+protected function getTestData(): array
+{
+    $data1 = [[-1500, 1000], [-1000, 800], [-500, 100], [0, -100], [1000, 900], [1500, 1200]];
+    $data2 = [[-1500, 1200], [-1000, 1000], [-500, 200], [0, 0], [1000, 1100], [1500, 1400]];
+    ...
+    $dataN = [...];
+    return [$data1, $data2, ... $dataN];
+}
+```
+You can define your own data format, implementing the **IDataSet** interface. See below for an example.
+  
+In the basic usage, you can call the **fromArray** or the **fromCSV** methods, using the Graph facade:
+```php
+use Marzzelo\Graph\Facades\Graph;
+
+$data = $this->getTestData();
+$graph = Graph::fromArray($data);
+```
+Finally, you can use the `save` method to save the graph to a file, or the `render64` method to get the image content as a base64 string:
+```php
+// to render:
+$img64 = $graph->render64('png');
+// view: <img src="{{ $graph }}" alt='' />
+// to save to disk:
+$graph->save('graph/testgraph.png');
+```
+Using the **fromCSV** method, you can create a graph from a CSV file:
+```php
+$graph = Graph::fromCSV('data.csv');
+```
+The CSV file must contain the column names in the first line and the data in the following lines.
+The first column must contain the independent variable and the following columns must contain the dependent variables.
+The separator character can be specified in the $options array (default is comma):
+```php
+$graph = Graph::fromCSV('data.csv', ['separator' => ',']);
+```
+There are also a lot of configuration options that can be passed to the **fromArray** and **fromCSV** methods:
+```php
+$options = [
+    'frame' => [
+        'width-px'         => 640,
+        'height-px'        => 480,
+        'background-color' => '#FFF',
+        'frame-color'      => '#777', 
+    ],
+
+    'axis' => [
+        'grid-size-xy'           => [null, null], // in physical units
+        'labels'                 => [null, null], // axis labels
+        'margin'                 => 20, // can be array [x, y] or int
+        'title'                  => '',
+        'title-color'            => null,  // takes a contrasting color from 'background-color'
+        'title-background-color' => null,  // takes 'background-color' darken by 20%
+        'axis-color'             => '#555', // color of axis lines
+        'grid-color'             => '#ddd',
+        'labels-color'           => '#777',
+    ],
+
+    // array of dataset settings, one for each dataset.
+    // if not specified, the default values are used.
+    'datasets' => [[  
+        'line-color'    => '#00A',
+        'marker-radius' => 0,
+        'marker-color'  => '#00A',
+    ]],
+
+    'csv'  => [
+        'delimiter' => ',',
+        'skip'      => 0,  // number of lines to skip
+    ],
+];
+
+```
+## Laravel support
+
+If you don't specify the 'datasets' option, default values are used.
+Default values can be customized, publishing the config file:
+```bash
+php artisan vendor:publish --provider="Marzzelo\Graph\GraphServiceProvider" --tag="config"
+```
+Or, ommit the parameters and select the config file from the list:
+```bash
+php artisan vendor:publish
+```
+The published config file is located in `config/graph.php`.
+
+A route to a test page has been implemented, so you can test the library with a simple web page.
+The default route is `/graph-test` and the page looks like this:
+![from CSV file](sample_view.png "graph from CSV file")
+
+```bash
+php artisan vendor:publish --provider="Marzzelo\Graph\GraphServiceProvider" --tag="marzzelo:graph-config"
+```
+You can change the route, publishing the config file and editing the `route` parameter.
+
+You can also customize the view, publishing the view file:
+```bash
+php artisan vendor:publish --provider="Marzzelo\Graph\GraphServiceProvider" --tag="marzzelo:graph-views"
+```
+The published view file is located in `resources/views/vendor/graph/graph-test.blade.php`.
+
+You can customize the datasets used for generating the test graph, publishing the assets file:
+```bash
+php artisan vendor:publish --provider="Marzzelo\Graph\GraphServiceProvider" --tag="marzzelo:graph-assets"
+```
+The published assets file is located in `public/vendor/graph/assets`.
+
+Messages and Errors are in English and Spanish. You can customize the messages, publishing the lang file:
+```bash
+php artisan vendor:publish --provider="Marzzelo\Graph\GraphServiceProvider" --tag="marzzelo:graph-translations"
+```
+The published lang file is located in `resources/lang/vendor/graph`.
+
+## Advanced Usage
+
+
+Using options, you can customize the graph appearance:
+```php
+$graph = Graph::fromCSV('data.csv', $options);
+```
+The output graph looks like this:
+![from CSV file](graph_csv.png "graph from CSV file")
+
+or this:
+![from CSV file](graph2_csv.png "graph from CSV file")
+
+
+## Using custom data format, Axis and Frames
+
 - Create the datasets using the class **DataSet**. Optionally, you can define the _marker radius_ and _line color_.
 ```php
 $dataset1 = new DataSet($data1, 6, '#070');

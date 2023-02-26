@@ -41,7 +41,6 @@ class CsvStringReader implements IReader
 	 */
 	private array $dataSets = [];
 
-
     private array $data = [];
 
 
@@ -69,7 +68,7 @@ class CsvStringReader implements IReader
 
 		for ($r = 0; $r < $nrows; $r++) {
 			for ($col = 1; $col < $ncols; $col++) {
-				$series[$col][] = [(float)$rows[$r][0], (float)$rows[$r][$col]];
+				$series[$col-1][] = [(float)$rows[$r][0], (float)$rows[$r][$col]];
 			}
 		}
 
@@ -110,7 +109,8 @@ class CsvStringReader implements IReader
 	}
 
 	/**
-	 * @param array $rows
+	 * @param  array  $rows
+	 * @param  int    $skip
 	 */
 	private function extractHeaders(array &$rows, int $skip = 0): void
 	{
@@ -121,8 +121,7 @@ class CsvStringReader implements IReader
             array_shift($rows);
         }
 
-        $this->headers = array_shift($rows);
-
+		$this->headers = array_shift($rows);
 		// header: ['labelx', 'labely1', 'labely2', ...]
 		
 	}

@@ -5,23 +5,27 @@ declare(strict_types=1);
 namespace Marzzelo\Graph;
 
 
+use Exception;
+use InvalidArgumentException;
+
 class AutoAxis extends BasicAxis implements IAxis
 {
 	/**
 	 * AutoAxis constructor.
 	 *
-	 * @param  array                  $data
+	 * @param  array                  $dataSets
 	 * @param  \Marzzelo\Graph\Frame  $frame  Frame object
 	 * @param  array                  $options
+	 * @throws \Exception
 	 */
-	public function __construct(array $dataSets, Frame &$frame, $options = [])
+	public function __construct(array $dataSets, Frame $frame, $options = [])
 	{
         if (count($dataSets) == 0)
-            throw new \Exception('No data provided');
+            throw new Exception('No data provided');
 
         // $data must be an array of IDataSet objects
         if (!($dataSets[0] instanceof IDataSet))
-            throw new \InvalidArgumentException('Invalid data provided (must be an array of IDataSet objects)');
+            throw new InvalidArgumentException('Invalid data provided (must be an array of IDataSet objects)');
             
 
 		[$xm, $xM, $ym, $yM] = $this->endpoints($dataSets);

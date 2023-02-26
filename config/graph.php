@@ -1,38 +1,38 @@
 <?php
 
 return [
-    'test-route' => 'graph-test',
- 
-    'default-options' => [
-        'frame'   => [
-            'width_px'         => 640,
-            'height_px'        => 400,
-            'background_color' => '#FFE',
-            'frame_color'      => '#bbb',
-        ],
+	'test-route' => 'graph-test',
 
-        'axis'    => [
-            'grid-size-xy'     => [null, null],
-            'labels'           => [null, null],
-            'margin'           => 20, // can be array [x, y] or int
-            'title'            => '',
-            'title-color'      => '#000',
-            'axis-color'       => '#555', // color of axis lines
-            'grid-color'       => '#ddd',
-            'background-color' => '#fff',
-            'labels-color'     => '#555',
-        ],
+	'default-options' => [
+		'frame' => [
+			'width-px'         => 640,
+			'height-px'        => 480,
+			'background-color' => '#CDE',
+			'frame-color'      => '#357435',
+		],
 
-        'dataset' => [
-            'line-color'    => '#00A',
-            'marker-radius' => 0,
-            'marker-color'  => '#00A',
-        ],
+		'axis' => [
+			'grid-size-xy'           => [null, null],
+			'labels'                 => [null, null],
+			'margin'                 => 5, // can be array [x, y] or int
+			'title'                  => '',
+			'title-color'            => null,  // takes a contrasting color from 'background-color'
+			'title-background-color' => null,  // takes 'background-color' darken by 20%
+			'axis-color'             => '#555', // color of axis lines
+			'grid-color'             => '#FFF',
+			'labels-color'           => '#777',
+		],
 
-        'csv'     => [
-            'delimiter' => ',',
-            'skip'      => 0,
-        ],
-        'test'    => 'Eureka!'
-    ]
+		'datasets' => [[
+			'line-color'    => '#00A',
+			'marker-radius' => 0,
+			'marker-color'  => '#00A',
+		]],
+
+		'csv'  => [
+			'delimiter' => ',',
+			'skip'      => 0,
+		],
+		'test' => 'Eureka!',
+	],
 ];
